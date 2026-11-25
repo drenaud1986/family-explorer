@@ -1,0 +1,22 @@
+{
+  "name": "Family Explorer – Les sorties deviennent des aventures",
+  "short_name": "Family Explorer",
+  "description": "Chasses au trésor, enquêtes, défis photo et aventures imaginaires en famille à Antibes et Juan-les-Pins.",
+  "lang": "fr",
+  "start_url": "./#/accueil",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8EC",
+  "theme_color": "#0B4A61",
+  "categories": ["kids", "travel", "education", "games"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Nouvelle aventure", "url": "./#/creer", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Ma collection", "url": "./#/collection", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
