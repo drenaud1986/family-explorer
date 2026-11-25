@@ -2,6 +2,13 @@
 
 PWA mobile (HTML/CSS/JS, sans build ni dépendance) qui transforme une sortie à Antibes / Juan-les-Pins en mission : chasse au trésor, enquête, nature, défi photo, challenges ou aventure imaginaire.
 
+**En ligne :** https://drenaud1986.github.io/family-explorer/ (GitHub Pages, dépôt drenaud1986/family-explorer)
+
+## Mettre à jour le site
+
+1. Modifier les fichiers, puis incrémenter `VERSION` dans `sw.js` pour que les téléphones récupèrent la nouvelle version.
+2. `git add -A`, `git commit -m "…"`, `git push` : GitHub Pages republie le site en une minute environ.
+
 ## Lancer en local
 
 ```powershell
