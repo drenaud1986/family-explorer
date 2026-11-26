@@ -82,7 +82,8 @@ export const PHOTOS = {
     "author": "Jeanne Menjoulet from Paris, France",
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
-    "page": "https://commons.wikimedia.org/wiki/File:Antibes,_le_port_(23877541264).jpg"
+    "page": "https://commons.wikimedia.org/wiki/File:Antibes,_le_port_(23877541264).jpg",
+    "note": "Œuvre de Jaume Plensa protégée par le droit d'auteur : à retirer avant un usage commercial."
   },
   "phare": {
     "title": "Le phare de la Garoupe",
@@ -212,6 +213,97 @@ export const PHOTOS = {
     "license": "Domaine public",
     "licenseUrl": "",
     "page": "https://commons.wikimedia.org/wiki/File:Juan-les-Pins,_jardin_de_la_pin%C3%A8de_-_btv1b531726408.jpg"
+  },
+  "vaugrenier-chateau": {
+    "title": "Le château de Vaugrenier",
+    "place": null,
+    "src": "https://upload.wikimedia.org/wikipedia/commons/2/22/Ch%C3%A2teau_de_vaugrenier.jpg",
+    "author": "Dandine",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "page": "https://commons.wikimedia.org/wiki/File:Ch%C3%A2teau_de_vaugrenier.jpg"
+  },
+  "vaugrenier": {
+    "title": "L'étang du parc de Vaugrenier",
+    "place": "vaugrenier",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Etang_Vaugrenier.JPG/960px-Etang_Vaugrenier.JPG",
+    "author": "Alexandre P.",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Etang_Vaugrenier.JPG"
+  },
+  "bernardin": {
+    "title": "La chapelle Saint-Bernardin",
+    "place": "bernardin",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/St_Bernardin_Antibes_facade.jpg/960px-St_Bernardin_Antibes_facade.jpg",
+    "author": "Aimelaime",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "page": "https://commons.wikimedia.org/wiki/File:St_Bernardin_Antibes_facade.jpg"
+  },
+  "bernardin-porte": {
+    "title": "La porte de la chapelle Saint-Bernardin",
+    "place": null,
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/St_Bernardin_Antibes_porte.jpg/960px-St_Bernardin_Antibes_porte.jpg",
+    "author": "Aimelaime",
+    "license": "Public domain",
+    "licenseUrl": "",
+    "page": "https://commons.wikimedia.org/wiki/File:St_Bernardin_Antibes_porte.jpg"
+  },
+  "gravette": {
+    "title": "La plage de la Gravette, sous les remparts",
+    "place": "gravette",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Plage_de_la_Gravette_-_Antibes.JPG/960px-Plage_de_la_Gravette_-_Antibes.JPG",
+    "author": "Cunikm",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "page": "https://commons.wikimedia.org/wiki/File:Plage_de_la_Gravette_-_Antibes.JPG"
+  },
+  "tirepoil": {
+    "title": "Le sentier de Tire-Poil",
+    "place": "tirepoil",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Sentier_du_Littoral%2C_Cap_d%27Antibes-France.jpg/960px-Sentier_du_Littoral%2C_Cap_d%27Antibes-France.jpg",
+    "author": "Gilbert Bochenek",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Sentier_du_Littoral,_Cap_d%27Antibes-France.jpg"
+  },
+  "place-nationale": {
+    "title": "La place Nationale",
+    "place": null,
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Place_Nationale_Antibes.jpg/960px-Place_Nationale_Antibes.jpg",
+    "author": "Helge Høifødt",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Place_Nationale_Antibes.jpg"
+  },
+  "bastion-jaume": {
+    "title": "Le bastion Saint-Jaume",
+    "place": "bastion-jaume",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/39/Bastion_Saint_Jaume%2C_Antibes_006.jpg/960px-Bastion_Saint_Jaume%2C_Antibes_006.jpg",
+    "author": "Abxbay",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Bastion_Saint_Jaume,_Antibes_006.jpg"
+  },
+  "calvaire": {
+    "title": "Le chemin du Calvaire vers le bois de la Garoupe",
+    "place": "calvaire",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Antibes_-_Chemin_de_croix_de_la_Garoupe.jpg/960px-Antibes_-_Chemin_de_croix_de_la_Garoupe.jpg",
+    "author": "FredSeiller",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "page": "https://commons.wikimedia.org/wiki/File:Antibes_-_Chemin_de_croix_de_la_Garoupe.jpg"
+  },
+  "street-art": {
+    "title": "Une fresque avenue Niquet",
+    "place": "street-art",
+    "src": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Avenue_niquet_street_art_01.jpg/960px-Avenue_niquet_street_art_01.jpg",
+    "author": "Abxbay",
+    "license": "CC0",
+    "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "page": "https://commons.wikimedia.org/wiki/File:Avenue_niquet_street_art_01.jpg",
+    "note": "Fresque protégée par le droit d'auteur : à retirer avant un usage commercial."
   }
 };
 
@@ -224,7 +316,8 @@ export const STEP_PHOTOS = {
   'ma-couleurs': 'marche', 're-tours': 'remparts', 're-defense': 'remparts',
   'pc-chateau': 'picasso', 'ar-amphore': 'archeo', 'ei-nom': 'eilenroc',
   'th-botanique': 'thuret', 'sa-carte': 'salis', 'sa-monet': 'monet-salis', 'jp-monet': 'monet-juan',
-  'pi-jazz': 'pinede', 'pi-arbres': 'pinede-1927', 'pe-humour': 'peynet', 'ex-fleur': 'exflora', 'jp-iles': 'juan',
+  'pi-jazz': 'pinede', 'pi-arbres': 'pinede-1927',
+  'bn-date': 'bernardin-porte', 'bn-place': 'place-nationale', 'bg-oratoire': 'calvaire', 'bj-nomade': 'nomade', 'pe-humour': 'peynet', 'ex-fleur': 'exflora', 'jp-iles': 'juan',
 };
 
 export const placePhoto = placeId => Object.values(PHOTOS).find(p => p.place === placeId) || null;

@@ -405,3 +405,94 @@ textarea.input { min-height: 96px; resize: vertical; }
 .credit-row img { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; flex: none; }
 .credit-row a { color: var(--sea); }
 @media (min-width: 520px) { .kit-grid { grid-template-columns: repeat(4, 1fr); } .icon-grid { grid-template-columns: repeat(6, 1fr); } }
+
+/* ---------- Animations et nouveaux éléments (v4) ---------- */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.view.anim > * { animation: rise .42s cubic-bezier(.2, .8, .3, 1) both; }
+.view.anim > *:nth-child(2) { animation-delay: .05s; }
+.view.anim > *:nth-child(3) { animation-delay: .1s; }
+.view.anim > *:nth-child(4) { animation-delay: .15s; }
+.view.anim > *:nth-child(5) { animation-delay: .2s; }
+.view.anim > *:nth-child(n+6) { animation-delay: .25s; }
+
+/* Mascotte vivante : elle respire et cligne des yeux */
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+.hero-art, .story-art .mascot, .clue-art .mascot, .reward-art .mascot, .levelup-art .mascot { animation: bob 3.2s ease-in-out infinite; }
+.mascot .m-eyes { transform-box: fill-box; transform-origin: center; animation: blink 4.6s infinite; }
+.role-card .mascot { animation: bob 3s ease-in-out infinite; }
+.role-card:nth-child(2) .mascot { animation-delay: .4s; }
+.role-card:nth-child(3) .mascot { animation-delay: .8s; }
+
+/* Vagues de la carte au trésor */
+@keyframes drift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+.tmap-waves { animation: drift 4s ease-in-out infinite; }
+@keyframes pinpulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.map-node { transform-box: fill-box; transform-origin: center; }
+.map-node:hover, .map-node:focus { animation: pinpulse .8s ease-in-out infinite; }
+
+/* Lettre du code qui se retourne, étoiles qui jaillissent */
+@keyframes flip { 0% { transform: rotateY(90deg) scale(.4); } 60% { transform: rotateY(-15deg) scale(1.1); } 100% { transform: none; } }
+.clue-pop .letter.flip { animation: flip .7s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes starpop { 0% { transform: scale(0) rotate(-40deg); opacity: 0; } 70% { transform: scale(1.3) rotate(10deg); opacity: 1; } 100% { transform: none; opacity: 1; } }
+.star-pop { display: inline-block; animation: starpop .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.stars-row .star-pop .ico { width: 44px; height: 44px; }
+
+/* Le savais-tu ? */
+.fact-card { display: flex; gap: 12px; align-items: flex-start; text-align: left; width: 100%;
+  background: #E8F4F8; border: 2px solid #BFE3EE; border-radius: var(--r-md); padding: 12px 14px; animation: rise .5s .8s both; }
+.fact-card .fact-ico { width: 40px; height: 40px; flex: none; }
+.fact-card b { color: var(--sea-deep); display: block; margin-bottom: 2px; }
+.fact-card p { font-size: 16px; }
+.pill.new { background: var(--terra); color: #fff; font-size: 12px; padding: 2px 8px; vertical-align: 2px; }
+.fact-line { padding: 10px 0; border-bottom: 2px dashed var(--line); font-size: 16px; }
+.fact-line:last-child { border-bottom: 0; }
+.fact-line.locked { color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+details.savoir summary { display: flex; align-items: center; gap: 10px; cursor: pointer; list-style: none; }
+details.savoir summary::-webkit-details-marker { display: none; }
+details.savoir summary b { flex: 1; }
+details.savoir[open] summary { margin-bottom: 6px; }
+.em-ico { width: 48px; height: 48px; flex: none; }
+
+/* Accueil : série et secrets */
+.home-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chip-stat { display: flex; align-items: center; gap: 10px; background: var(--card); border-radius: var(--r-md); padding: 12px; box-shadow: var(--shadow); font-size: 14px; line-height: 1.2; color: inherit; text-decoration: none; }
+.chip-stat .ico { width: 34px; height: 34px; flex: none; }
+.chip-stat b { font-family: var(--font-head); font-size: 22px; display: block; }
+.chip-stat:not(.hot) .ico { filter: grayscale(1); opacity: .5; }
+.chip-stat.hot .ico { animation: bob 1.6s ease-in-out infinite; }
+
+/* Groupes de lieux */
+.area-title { margin-top: 8px; font-size: 16px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .05em; }
+
+/* Bouton son */
+.icon-btn.snd { width: 44px; height: 44px; padding: 8px; }
+
+/* Coffre au trésor animé */
+.reward-scene { position: relative; width: 220px; height: 190px; margin: 0 auto; }
+.reward-chest { position: absolute; inset: 0; }
+.reward-scene .reward-art { position: absolute; width: 120px; right: -34px; bottom: -10px; }
+.chest-anim { width: 100%; height: 100%; overflow: visible; }
+.chest-lid { transform-box: fill-box; transform-origin: 0% 100%; animation: lid .9s .5s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes lid { from { transform: none; } to { transform: rotate(-28deg) translate(-6px, -8px); } }
+.chest-coins .coin { opacity: 0; animation: coin 1.4s cubic-bezier(.2, .8, .3, 1) both; transform-box: fill-box; }
+.chest-coins .c0 { animation-delay: .9s; } .chest-coins .c1 { animation-delay: 1s; } .chest-coins .c2 { animation-delay: 1.1s; }
+.chest-coins .c3 { animation-delay: 1.2s; } .chest-coins .c4 { animation-delay: 1.3s; } .chest-coins .c5 { animation-delay: 1.45s; }
+@keyframes coin { 0% { opacity: 0; transform: translateY(50px) scale(.4); } 40% { opacity: 1; } 100% { opacity: 1; transform: translateY(-12px) scale(1); } }
+.chest-glow { opacity: 0; transform-box: fill-box; transform-origin: center; animation: glow 2s 1s ease-in-out infinite; }
+@keyframes glow { 0%, 100% { opacity: .2; transform: scale(.9); } 50% { opacity: .9; transform: scale(1.1); } }
+
+/* Nouveau grade */
+.levelup { display: flex; flex-direction: column; gap: 10px; }
+.levelup-art { width: 150px; margin: 0 auto; }
+
+/* Confettis plus festifs */
+.confetti i:nth-child(3n) { border-radius: 50%; width: 10px; height: 10px; }
+.confetti i:nth-child(5n) { width: 6px; height: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot .m-eyes, .hero-art, .tmap-waves, .chest-lid, .chest-coins .coin, .chest-glow { animation: none !important; }
+  .chest-coins .coin { opacity: 1; }
+}
+
+.tabs button { font-size: 14px; padding: 0 2px; letter-spacing: -.01em; }

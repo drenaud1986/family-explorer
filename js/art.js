@@ -61,6 +61,17 @@ const I = {
   umbrella: `<path d="M32 30v20a5 5 0 0 1-10 0" stroke-width="3.5"/><path d="M6 30Q8 8 32 8t26 22q-6-5-13 0-6-5-13 0-6-5-13 0-7-5-13 0z" fill="${C.sea}"/>`,
   note: `<path d="M24 46V14l26-6v32" stroke-width="3.5"/><path d="M24 20l26-6" stroke-width="5"/><ellipse cx="18" cy="47" rx="8" ry="6" fill="${C.purple}"/><ellipse cx="44" cy="41" rx="8" ry="6" fill="${C.purple}"/>`,
   boat: `<path d="M8 40h48l-8 12H16z" fill="${C.wood}"/><path d="M32 8v32" stroke-width="3"/><path d="M34 10l16 26H34z" fill="${C.cream}"/><path d="M30 14L16 36h14z" fill="${C.terra}"/>`,
+  bucket: `<path d="M22 22a10 10 0 0 1 20 0" stroke-width="3"/><path d="M14 24h36l-5 32H19z" fill="${C.sea}"/><rect x="12" y="20" width="40" height="7" rx="3" fill="${C.gem}"/><path d="M22 36h20" stroke="#fff" stroke-width="2.5"/><path d="M50 52q6-4 10 2" fill="${C.parch2}"/>`,
+  bell: `<circle cx="32" cy="9" r="4"/><path d="M32 13c-12 0-14 12-14 22l-6 10h40l-6-10c0-10-2-22-14-22z" fill="${C.sun}"/><circle cx="32" cy="50" r="5" fill="${C.wood}"/><path d="M24 26q2-6 7-7" stroke="#fff" stroke-width="2.5"/>`,
+  pine: `<path d="M31 58q2-14 1-26" stroke="${C.wood}" stroke-width="5"/><path d="M31 58q2-14 1-26" stroke-width="2"/><ellipse cx="22" cy="24" rx="14" ry="8" fill="${C.leaf}"/><ellipse cx="42" cy="22" rx="15" ry="8" fill="${C.leaf}"/><ellipse cx="32" cy="14" rx="14" ry="8" fill="#4FAE68"/>`,
+  brush: `<g transform="rotate(-40 32 32)"><rect x="29" y="22" width="6" height="34" rx="3" fill="${C.wood}"/><rect x="27" y="16" width="10" height="8" fill="${C.grey}"/><path d="M27 16q5-14 10 0z" fill="${C.terra}"/></g><circle cx="48" cy="48" r="4" fill="${C.sea}" stroke="none"/><circle cx="54" cy="40" r="3" fill="${C.sun}" stroke="none"/>`,
+  fish: `<path d="M8 40q4-14 10-28M14 54q2-10 8-16M54 56q-2-12 4-22" stroke="${C.leaf}" stroke-width="3.5"/><path d="M14 30q14-14 32 0-18 14-32 0z" fill="${C.gem}"/><path d="M46 30l10-8v16z" fill="${C.gem}"/><circle cx="22" cy="28" r="2.5" fill="${C.ink}"/><path d="M30 24v12" stroke-width="2"/>`,
+  spray: `<rect x="18" y="22" width="20" height="34" rx="4" fill="${C.terra}"/><rect x="22" y="14" width="12" height="9" rx="2" fill="${C.grey}"/><rect x="25" y="9" width="6" height="6" rx="1" fill="${C.ink}"/><path d="M18 34h20" stroke="#fff" stroke-width="2.5"/><circle cx="42" cy="10" r="3" fill="${C.sun}" stroke="none"/><circle cx="50" cy="14" r="3.5" fill="${C.sea}" stroke="none"/><circle cx="46" cy="22" r="3" fill="${C.leaf}" stroke="none"/><circle cx="55" cy="6" r="2.5" fill="#F48FB1" stroke="none"/>`,
+  duck: `<path d="M10 40q0 14 22 14 22 0 24-14-10 4-18 0z" fill="${C.sun}"/><circle cx="20" cy="26" r="10" fill="${C.sun}"/><path d="M9 26l-6 3 6 2z" fill="${C.terra}"/><circle cx="18" cy="23" r="2" fill="${C.ink}"/><path d="M4 56q28 6 56 0" stroke="${C.sea}" stroke-width="3"/>`,
+  speaker: `<path d="M10 24h10l14-12v40L20 40H10z" fill="${C.sun}"/><path d="M42 22q8 10 0 20M48 16q14 16 0 32" stroke-width="3.5"/>`,
+  mute: `<path d="M10 24h10l14-12v40L20 40H10z" fill="${C.grey}"/><path d="M42 24l14 16M56 24L42 40" stroke-width="4"/>`,
+  book: `<path d="M8 14q12-4 24 4 12-8 24-4v38q-12-4-24 4-12-8-24-4z" fill="${C.cream}"/><path d="M32 18v38" /><path d="M14 24q8-2 13 2M14 32q8-2 13 2M37 26q5-4 13-2M37 34q5-4 13-2" stroke-width="2"/>`,
+  flame: `<path d="M32 6q4 12 12 18 8 8 6 18-2 14-18 16-16-2-18-16-2-10 6-16 0 8 6 10-2-16 6-30z" fill="${C.orange}"/><path d="M32 30q8 8 6 16-2 6-6 6-6 0-7-6 0-8 7-16z" fill="${C.sun}"/>`,
   dice: `<rect x="10" y="10" width="44" height="44" rx="9" fill="${C.cream}"/><circle cx="22" cy="22" r="4" fill="${C.terra}" stroke="none"/><circle cx="42" cy="22" r="4" fill="${C.terra}" stroke="none"/><circle cx="32" cy="32" r="4" fill="${C.terra}" stroke="none"/><circle cx="22" cy="42" r="4" fill="${C.terra}" stroke="none"/><circle cx="42" cy="42" r="4" fill="${C.terra}" stroke="none"/>`,
 };
 export const ICON_NAMES = Object.keys(I);
@@ -76,6 +87,8 @@ export const PLACE_ICON = {
   'vieil-antibes': 'castle', 'fort-carre': 'fort', 'port-vauban': 'anchor', exflora: 'flower', pinede: 'pinecone', garoupe: 'lighthouse',
   marche: 'tomato', remparts: 'wall', picasso: 'palette', archeo: 'amphora', eilenroc: 'flower', 'juan-plage': 'shell',
   thuret: 'palm', brague: 'tree', salis: 'wave', peynet: 'pencil', autour: 'compass',
+  jazz: 'note', gravette: 'bucket', 'bastion-jaume': 'flag', bernardin: 'bell', 'bois-garoupe': 'pine', hartung: 'brush',
+  posidonia: 'fish', 'street-art': 'spray', tirepoil: 'footprints', calvaire: 'boot', vaugrenier: 'duck',
 };
 export const TYPE_ICON = { treasure: 'chest', detective: 'magnifier', nature: 'leaf', photo: 'camera', challenge: 'bolt', imaginary: 'crown', surprise: 'dice' };
 export const KIND_ICON = { observe: 'binoculars', photo: 'camera', quiz: 'puzzle', count: 'tally', challenge: 'bolt', imagine: 'thought', final: 'lock' };
@@ -84,7 +97,7 @@ const BADGE_ICON = {
   'n-1': 'leaf', 'n-3': 'binoculars', 'n-vert': 'tree', 'n-mer': 'shell', 'n-thuret': 'palm', 'n-foret': 'footprints',
   'h-antipolis': 'amphora', 'h-fort': 'fort', 'h-musees': 'palette', 'h-detective': 'magnifier', 'h-artistes': 'pencil',
   's-printemps': 'flower', 's-ete': 'sun', 's-automne': 'leaf', 's-hiver': 'snowflake', 's-pluie': 'umbrella',
-  'e-1': 'boot', 'e-5': 'backpack', 'e-10': 'crown', 'e-types': 'puzzle', 'e-equipe': 'heart', 'e-surprise': 'chest', 'e-bonus': 'gem', 'e-lieux': 'map', 'e-20': 'trophy', 'e-tous': 'compass',
+  'e-1': 'boot', 'e-5': 'backpack', 'e-10': 'crown', 'e-types': 'puzzle', 'e-equipe': 'heart', 'e-surprise': 'chest', 'e-bonus': 'gem', 'e-lieux': 'map', 'e-20': 'trophy', 'e-tous': 'compass', 'e-savoir': 'book', 'e-serie': 'flame', 'n-gardien': 'pine',
   'x-halloween': 'pumpkin', 'x-noel': 'tree', 'x-musique': 'note', 'x-jazz': 'note', 'x-nouvelan': 'star', 'x-mimosa': 'sun',
 };
 export const COLLECTION_COLOR = { quartiers: C.sea, nature: C.leaf, histoire: C.wood, saisons: C.terra, explorateurs: '#E0A21B', exceptionnels: '#8E5BB5' };
@@ -155,7 +168,7 @@ export function mascot({ hat = 'explorer', mood = 'happy', accessory = true, cls
     <ellipse cx="100" cy="102" rx="55" ry="48" fill="${C.fox}"/>
     <path d="M50 104q8 38 50 44 42-6 50-44-22 16-50 9-28 7-50-9z" fill="${C.cream}"/>
     <circle cx="68" cy="122" r="7" fill="${C.pink}" stroke="none" opacity=".75"/><circle cx="132" cy="122" r="7" fill="${C.pink}" stroke="none" opacity=".75"/>
-    ${eyes}
+    <g class="m-eyes">${eyes}</g>
     <ellipse cx="100" cy="118" rx="7.5" ry="5.5" fill="${C.ink}"/>
     ${MOUTH[mood] || MOUTH.happy}
     ${HATS[hat] ?? ''}
@@ -174,39 +187,58 @@ export const guideArt = (adv, mood = 'happy', opts = {}) => mascot({ hat: guideH
 
 // ---------- Carte au trésor illustrée d'Antibes ----------
 export const MAP_POS = {
-  brague: [214, 60], 'fort-carre': [238, 112], 'port-vauban': [236, 158], marche: [194, 186], 'vieil-antibes': [238, 206],
-  picasso: [284, 196], peynet: [198, 236], remparts: [282, 248], archeo: [262, 282], salis: [246, 318],
-  garoupe: [282, 372], thuret: [232, 366], eilenroc: [246, 446], 'juan-plage': [152, 356], pinede: [124, 324], exflora: [66, 352],
+  vaugrenier: [150, 58], brague: [214, 58], hartung: [110, 130], 'fort-carre': [236, 110], 'bastion-jaume': [272, 138], 'port-vauban': [232, 150],
+  gravette: [262, 176], marche: [196, 190], 'vieil-antibes': [234, 200], picasso: [290, 206], 'street-art': [158, 214], bernardin: [212, 236],
+  peynet: [176, 256], remparts: [276, 242], archeo: [256, 276], salis: [240, 310], calvaire: [276, 330], 'bois-garoupe': [222, 346],
+  garoupe: [288, 370], thuret: [246, 380], tirepoil: [296, 416], posidonia: [214, 420], eilenroc: [254, 448],
+  'juan-plage': [160, 366], jazz: [150, 324], pinede: [112, 340], exflora: [60, 360],
 };
-const ROUTE = ['brague', 'fort-carre', 'port-vauban', 'marche', 'vieil-antibes', 'peynet', 'picasso', 'remparts', 'archeo', 'salis', 'garoupe', 'thuret', 'eilenroc', 'juan-plage', 'pinede', 'exflora'];
+const ROUTE = ['vaugrenier', 'brague', 'fort-carre', 'bastion-jaume', 'port-vauban', 'gravette', 'vieil-antibes', 'marche', 'street-art', 'peynet', 'bernardin', 'picasso', 'remparts', 'archeo', 'salis', 'calvaire', 'bois-garoupe', 'garoupe', 'thuret', 'tirepoil', 'eilenroc', 'posidonia', 'juan-plage', 'jazz', 'pinede', 'exflora'];
 
 export function treasureMap(places, explored) {
   const coast = 'M0 0H252Q256 30 258 46Q268 80 262 120Q258 140 250 152L266 170Q290 186 292 214Q298 240 290 262Q268 276 266 296Q284 312 300 330Q312 372 302 404Q290 446 272 480Q246 488 230 456Q214 430 216 400Q200 376 176 372Q140 366 112 370Q80 378 56 384Q30 388 0 386Z';
   const route = ROUTE.filter(id => MAP_POS[id]).map((id, i) => `${i ? 'L' : 'M'}${MAP_POS[id][0]} ${MAP_POS[id][1]}`).join('');
   const waves = [[320, 60], [300, 150], [336, 230], [326, 300], [340, 420], [180, 430], [110, 410], [60, 440], [200, 500], [330, 500]]
     .map(([x, y]) => `<path d="M${x - 10} ${y}q5-5 10 0t10 0" stroke="${C.sea}" stroke-width="2.5"/>`).join('');
-  const trees = [[40, 60], [70, 110], [120, 70], [40, 200], [90, 240], [140, 160], [30, 300], [160, 270]]
+  const trees = [[40, 60], [70, 100], [40, 200], [92, 236], [30, 300], [118, 282], [80, 176]]
     .map(([x, y]) => nested('tree', x - 14, y - 14, 28)).join('');
   const pins = places.map(p => {
     const pos = MAP_POS[p.id]; if (!pos) return '';
     const done = explored.has(p.id);
     return `<g class="map-node" data-act="map-pin" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.name}${done ? ', exploré' : ', à découvrir'}">
-      <circle cx="${pos[0]}" cy="${pos[1]}" r="19" fill="${done ? C.sun : C.cream}" stroke="${C.ink}" stroke-width="3" ${done ? '' : 'stroke-dasharray="5 4"'}/>
-      ${nested(PLACE_ICON[p.id] || 'star', pos[0] - 13, pos[1] - 13, 26)}
-      ${done ? `<circle cx="${pos[0] + 14}" cy="${pos[1] - 14}" r="7" fill="${C.leaf}" stroke="${C.ink}" stroke-width="2"/><path d="M${pos[0] + 10.5} ${pos[1] - 14}l2.5 2.5 4-5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : ''}
+      <circle class="pin-bg" cx="${pos[0]}" cy="${pos[1]}" r="16" fill="${done ? C.sun : C.cream}" stroke="${C.ink}" stroke-width="3" ${done ? '' : 'stroke-dasharray="5 4"'}/>
+      ${nested(PLACE_ICON[p.id] || 'star', pos[0] - 11, pos[1] - 11, 22)}
+      ${done ? `<circle cx="${pos[0] + 12}" cy="${pos[1] - 12}" r="6.5" fill="${C.leaf}" stroke="${C.ink}" stroke-width="2"/><path d="M${pos[0] + 9} ${pos[1] - 12}l2.2 2.2 3.6-4.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : ''}
     </g>`;
   }).join('');
   return `<svg class="tmap" viewBox="0 0 360 540" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Carte au trésor d'Antibes et Juan-les-Pins">
     <rect width="360" height="540" fill="${C.sky}"/>
-    ${g(waves)}
+    <g class="tmap-waves">${g(waves)}</g>
     <path d="${coast}" fill="${C.parch}" stroke="${C.ink}" stroke-width="3.5" stroke-linejoin="round"/>
     <path d="M110 6q30 18 60 20t84 22" stroke="${C.sea}" stroke-width="5" fill="none" stroke-linecap="round"/>
     ${trees}
     <path d="${route}" stroke="${C.terra}" stroke-width="3.5" stroke-dasharray="2 9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
     ${nested('boat', 300, 78, 46)}${nested('boat', 20, 410, 40)}
     ${nested('compass', 290, 456, 62)}
-    <g transform="translate(14 14)">${g(`<path d="M0 6h150l-8 14 8 14H0l8-14z" fill="${C.cream}"/>`, 2.5)}<text x="75" y="25" text-anchor="middle" font-family="'Baloo 2', Nunito, sans-serif" font-weight="800" font-size="15" fill="${C.ink}">Antibes · Juan-les-Pins</text></g>
+    <g transform="translate(26 462)">${g(`<path d="M0 6h150l-8 14 8 14H0l8-14z" fill="${C.cream}"/>`, 2.5)}<text x="75" y="25" text-anchor="middle" font-family="'Baloo 2', Nunito, sans-serif" font-weight="800" font-size="15" fill="${C.ink}">Antibes · Juan-les-Pins</text></g>
     <text x="150" y="518" text-anchor="middle" font-family="'Baloo 2', Nunito, sans-serif" font-size="15" font-weight="800" fill="${C.sea}" letter-spacing="2">Mer Méditerranée</text>
     ${pins}
   </svg>`;
+}
+
+// ---------- Coffre au trésor animé ----------
+export function chest() {
+  return `<svg class="chest-anim" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  ${g(`
+    <g class="chest-glow"><circle cx="100" cy="86" r="60" fill="${C.sun}" fill-opacity=".35" stroke="none"/></g>
+    <g class="chest-coins">
+      ${[[70, 70], [100, 56], [130, 70], [86, 46], [116, 44]].map(([x, y], i) => `<g class="coin c${i}"><circle cx="${x}" cy="${y}" r="9" fill="${C.sun}"/><circle cx="${x}" cy="${y}" r="5" stroke-width="2"/></g>`).join('')}
+      <polygon class="coin c5" points="100,30 104,40 114,40 106,46 109,56 100,50 91,56 94,46 86,40 96,40" fill="${C.gem}" stroke-width="2.5"/>
+    </g>
+    <rect x="40" y="90" width="120" height="66" rx="8" fill="${C.wood}"/>
+    <rect x="40" y="96" width="120" height="12" fill="${C.sun}"/>
+    <path d="M62 96v60M138 96v60" stroke-width="3"/>
+    <rect x="90" y="96" width="20" height="26" rx="4" fill="${C.sun}"/>
+    <g class="chest-lid"><path d="M40 92V74q0-26 60-26t60 26v18z" fill="${C.wood2}"/><rect x="40" y="84" width="120" height="10" fill="${C.sun}"/><path d="M62 54v38M138 54v38" stroke-width="3"/></g>
+  `, 4)}</svg>`;
 }

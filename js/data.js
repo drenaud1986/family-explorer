@@ -1,4 +1,5 @@
 // Family Explorer — contenu : lieux d'Antibes / Juan-les-Pins, missions, types d'aventures, badges.
+import { MORE_PLACES, MORE_PLACE_STEPS, FACTS, MORE_BADGES } from './data-antibes2.js';
 import { EXTRA_PLACES, EXTRA_PLACE_STEPS, EXTRA_GENERIC_STEPS, EXTRA_BONUS_STEPS, EXTRA_STORIES, EXTRA_THEMES } from './data-extra.js';
 
 // Types d'aventure : treasure, detective, nature, photo, challenge, imaginary.
@@ -505,6 +506,10 @@ GENERIC_STEPS.push(...EXTRA_GENERIC_STEPS);
 BONUS_STEPS.push(...EXTRA_BONUS_STEPS);
 for (const [t, s] of Object.entries(EXTRA_STORIES)) { TYPES[t].titles.push(...s.titles); TYPES[t].intros.push(...s.intros); }
 TYPES.imaginary.themes.push(...EXTRA_THEMES);
+PLACES.push(...MORE_PLACES);
+for (const [id, steps] of Object.entries(MORE_PLACE_STEPS)) PLACES.find(p => p.id === id)?.steps.push(...steps);
+for (const p of PLACES) for (const st of p.steps) if (FACTS[st.id] && !st.fact) st.fact = FACTS[st.id];
+for (const st of GENERIC_STEPS) if (FACTS[st.id] && !st.fact) st.fact = FACTS[st.id];
 
 // ---------- Badges ----------
 // cond(stats, adv) -> bool. stats = statistiques après l'aventure, adv = aventure terminée
@@ -557,6 +562,8 @@ export const COLLECTIONS = [
     { id: 'x-mimosa', name: 'Fleur de mimosa', emoji: '🌼', desc: 'Une aventure en février, saison du mimosa', cond: (s, a) => new Date(a.finishedAt).getMonth() === 1 },
   ] },
 ];
+
+for (const b of MORE_BADGES) COLLECTIONS.find(c => c.id === (b.id.startsWith('n-') ? 'nature' : 'explorateurs')).badges.push(b);
 
 export const ALL_BADGES = COLLECTIONS.flatMap(c => c.badges.map(b => ({ ...b, collection: c.id })));
 

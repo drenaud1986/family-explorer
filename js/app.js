@@ -3,8 +3,9 @@ import { PLACES, TYPES, ROLES, COLLECTIONS, ALL_BADGES, LEVELS, AVATARS, WEATHER
 import { generate, suggest, nearestPlace, warningsFor, levelFor, computeLevels, rng } from './generator.js';
 import { state, save, uid, putPhoto, deletePhoto, photoURL, resizeImage, requestPersistence, exportBackup, importBackup, replaceState } from './store.js';
 import { renderSouvenir } from './souvenir.js';
-import { icon, mascot, medal, guideArt, treasureMap, PLACE_ICON, TYPE_ICON, KIND_ICON, ROLE_HAT, ICON_NAMES, MOODS, HAT_NAMES, COLLECTION_COLOR } from './art.js';
+import { chest, icon, mascot, medal, guideArt, treasureMap, PLACE_ICON, TYPE_ICON, KIND_ICON, ROLE_HAT, ICON_NAMES, MOODS, HAT_NAMES, COLLECTION_COLOR } from './art.js';
 import { PHOTOS, placePhoto, stepPhoto, photoURLs } from './photos.js';
+import { SOUNDS, play, setSoundEnabled, soundEnabled, preloadSounds, soundURLs } from './sounds.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const view = $('#view');
@@ -17,6 +18,18 @@ const explored = () => new Set(doneAdvs().map(a => a.placeId));
 const advStars = a => a.steps.reduce((s, x) => s + (x.stars || 0), 0) + (a.bonus?.done ? 2 : 0);
 const totalStars = () => doneAdvs().reduce((s, a) => s + advStars(a), 0);
 const hourNow = () => new Date().getHours();
+const youngestAge = () => Math.min(99, ...state.family.members.map(m => m.age));
+const factOf = st => st.fact || st.quiz?.explain || null;
+const factTotal = placeId => (placeById(placeId)?.steps || []).filter(factOf).length;
+const factCount = () => Object.keys(state.facts || {}).length;
+// Semaine (lundi) d'une date, pour la série d'aventures
+const weekIdx = d => Math.floor((new Date(d).getTime() - Date.UTC(2024, 0, 1)) / (7 * 864e5));
+function streak() {
+  const weeks = new Set(doneAdvs().map(a => weekIdx(a.finishedAt)));
+  let w = weekIdx(new Date()); if (!weeks.has(w)) w--;
+  let n = 0; while (weeks.has(w)) { n++; w--; }
+  return n;
+}
 const fmtDate = iso => new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
 let draft = null;      // paramètres du générateur
@@ -106,6 +119,7 @@ function render() {
   document.getElementById('tabbar').hidden = tabbarHidden;
   view.classList.toggle('no-tabs', tabbarHidden);
   view.innerHTML = fn(r);
+  if (ui.lastPath !== r.path + (r.arg || '')) { ui.lastPath = r.path + (r.arg || ''); view.classList.remove('anim'); void view.offsetWidth; view.classList.add('anim'); clearTimeout(ui.animT); ui.animT = setTimeout(() => view.classList.remove('anim'), 900); }
   const tab = { creer: 'accueil', apercu: 'accueil', album: 'collection', kit: 'famille', credits: 'famille' }[r.path] || r.path;
   document.querySelectorAll('.tabbar a').forEach(a => {
     a.toggleAttribute('aria-current', a.dataset.tab === tab); if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page');
@@ -149,7 +163,7 @@ function home() {
   const members = state.family.members;
   const cur = currentAdv();
   const w = state.weather; const wk = weatherKind();
-  const sug = suggest(wk, hourNow(), explored(), Number(new Date().toISOString().slice(0, 10).replace(/-/g, '')));
+  const sug = suggest(wk, hourNow(), explored(), Number(new Date().toISOString().slice(0, 10).replace(/-/g, '')), youngestAge());
   const stars = totalStars(); const lv = levelInfo(stars);
   const recent = Object.entries(state.badges).sort((a, b) => b[1].localeCompare(a[1])).slice(0, 5).map(([id]) => ALL_BADGES.find(b => b.id === id)).filter(Boolean);
   const T = TYPES[sug.type];
@@ -194,6 +208,11 @@ function home() {
       <div class="progress" role="progressbar" aria-valuenow="${lv.pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${lv.pct}%"></i></div>
       ${lv.next ? `<span class="small muted">Prochain grade : ${lv.next.emoji} ${lv.next.name}</span>` : '<span class="small">Grade maximum atteint !</span>'}
     </div>
+  </div>
+
+  <div class="home-chips">
+    <div class="chip-stat ${streak() ? 'hot' : ''}">${icon('flame')}<span><b>${streak()}</b> semaine${streak() > 1 ? 's' : ''} d'affilée</span></div>
+    <a class="chip-stat" href="#/collection" data-act="coll-tab" data-id="savoir">${icon('book')}<span><b>${factCount()}</b> secret${factCount() > 1 ? 's' : ''} d'Antibes</span></a>
   </div>
 
   ${recent.length ? `<div class="section-title"><h3>Derniers badges</h3><a href="#/collection" class="small" style="color:var(--sea)">Tout voir</a></div>
@@ -269,6 +288,13 @@ function ensureDraft(q = {}) {
   draft.memberIds = draft.memberIds.filter(memberById);
   if (!draft.memberIds.length) draft.memberIds = state.family.members.map(m => m.id);
 }
+const AREAS = [
+  ['Vieil Antibes et le port', p => p.area === 'Antibes' && !p.tags.includes('nature') && !p.indoor],
+  ['Musées et lieux abrités', p => p.indoor],
+  ['Cap d\'Antibes', p => p.area === 'Cap d\'Antibes' && !p.indoor],
+  ['Juan-les-Pins', p => p.area === 'Juan-les-Pins' && !p.indoor],
+  ['Parcs et nature', p => (p.area === 'Antibes' && p.tags.includes('nature') && !p.indoor) || p.area === 'Villeneuve-Loubet'],
+];
 function wizard(r) {
   ensureDraft(r.q);
   if (r.q.place || r.q.type) history.replaceState(null, '', '#/creer');
@@ -277,15 +303,16 @@ function wizard(r) {
   const sel = draft.memberIds.map(memberById).filter(Boolean);
   const levels = computeLevels(sel, draft.difficulty);
   const place = placeById(draft.placeId);
-  const warns = place ? warningsFor(place, draft.weather, hourNow()) : [];
+  const warns = place ? warningsFor(place, draft.weather, hourNow(), sel) : [];
   const press = c => `aria-pressed="${c}"`;
   return `
   <div class="top"><a class="icon-btn" href="#/accueil" aria-label="Retour">←</a><h1>Nouvelle aventure</h1></div>
 
   <section class="stack"><h2>1. Où allons-nous ?</h2>
+    ${AREAS.map(([title, test]) => `<h3 class="area-title">${title}</h3><div class="place-grid">
+      ${PLACES.filter(test).map(p => `<button class="place" data-act="d-set" data-k="placeId" data-v="${p.id}" ${press(draft.placeId === p.id)}>
+        <span class="em">${placeIcon(p.id)}</span><b>${esc(p.name)}</b><small>${p.indoor ? '☔ abrité' : p.area}${p.minAge ? ` · ${p.minAge} ans +` : ''}</small>${ex.has(p.id) ? '<span class="done-dot" aria-label="déjà exploré">✅</span>' : ''}</button>`).join('')}</div>`).join('')}
     <div class="place-grid">
-      ${PLACES.map(p => `<button class="place" data-act="d-set" data-k="placeId" data-v="${p.id}" ${press(draft.placeId === p.id)}>
-        <span class="em">${placeIcon(p.id)}</span><b>${esc(p.name)}</b><small>${p.area}${p.indoor ? ' · ☔' : ''}</small>${ex.has(p.id) ? '<span class="done-dot" aria-label="déjà exploré">✅</span>' : ''}</button>`).join('')}
       <button class="place" data-act="d-set" data-k="placeId" data-v="autour" ${press(draft.placeId === 'autour')}><span class="em">${placeIcon('autour')}</span><b>Autour de moi</b><small>Géolocalisation</small></button>
     </div>
   </section>
@@ -344,6 +371,7 @@ async function doGenerate(seed) {
     type: draft.type, weather: draft.weather, hour: hourNow(), seed, history: state.history[placeKey] || [],
   });
   state.settings.duration = draft.duration; state.settings.difficulty = draft.difficulty; save();
+  play('magic', { volume: 0.7 });
   go('#/apercu');
 }
 
@@ -387,7 +415,11 @@ function startAdventure() {
   if (cur) cur.status = 'abandoned';
   const a = { ...preview, id: uid(), createdAt: new Date().toISOString(), status: 'active', pos: 0, introSeen: false };
   state.adventures.push(a); state.currentId = a.id; save();
-  prefetchPhotos(photoURLs(a.placeId, a.steps.map(s => s.id))); // disponibles hors connexion pendant l'aventure
+  prefetchPhotos([...photoURLs(a.placeId, a.steps.map(s => s.id)), ...soundURLs()]); // disponibles hors connexion pendant l'aventure
+  play('page');
+  const pl = placeById(a.placeId); const m = new Date().getMonth();
+  if (pl?.tags.includes('mer')) play('gull', { volume: 0.35, delay: 500 });
+  else if (pl?.tags.includes('nature') && m >= 5 && m <= 8) play('cicada', { volume: 0.3, delay: 500 });
   preview = null; ui.quizWrong.clear(); ui.clue = null; ui.bonusHidden = false;
   go('#/aventure');
 }
@@ -411,6 +443,7 @@ function adventure() {
   <div class="adv-head">
     <button class="icon-btn" data-act="adv-menu" aria-label="Options de l'aventure">☰</button>
     <div class="meta"><b>${esc(a.title)} · ${a.pos + 1}/${missions}</b><div class="progress"><i style="width:${pct}%"></i></div></div>
+    <button class="icon-btn snd" data-act="sound-toggle" aria-label="${soundEnabled() ? 'Couper le son' : 'Activer le son'}">${icon(soundEnabled() ? 'speaker' : 'mute')}</button>
     <span class="pill">⭐ ${stars}</span>
   </div>
   <div class="letters" aria-label="Lettres du code secret">${letters.map(s => `<span class="letter ${s.done ? '' : 'empty'}">${s.done ? s.letter : '?'}</span>`).join('')}</div>`;
@@ -435,8 +468,9 @@ function adventure() {
     <div class="card clue-pop">
       <div class="clue-art">${guideArt(a, 'cheer')}</div>
       <p class="muted">Mission réussie ! Nouvelle lettre du code :</p>
-      <div class="letter">${ui.clue.letter}</div>
-      <div class="stars-row">${Array.from({ length: 3 }, (_, i) => icon('star', i < ui.clue.stars ? 'on' : 'off')).join('')}</div>
+      <div class="letter flip">${ui.clue.letter}</div>
+      <div class="stars-row">${Array.from({ length: 3 }, (_, i) => `<span class="star-pop" style="animation-delay:${0.35 + i * 0.18}s">${icon('star', i < ui.clue.stars ? 'on' : 'off')}</span>`).join('')}</div>
+      ${ui.clue.fact ? `<div class="fact-card"><span class="fact-ico">${icon('book')}</span><div><b>Le savais-tu ?${ui.clue.isNew ? ' <span class="pill new">Nouveau secret !</span>' : ''}</b><p>${esc(ui.clue.fact)}</p></div></div>` : ''}
       <div class="bubble parchment" style="text-align:left;width:100%"><b>${esc(a.guide.name)}</b>${esc(a.lines[a.pos % a.lines.length])}</div>
     </div>
     <button class="btn big block leaf" data-act="clue-ok">${last ? icon('key', 'ico-btn') + ' Le code secret' : 'Mission suivante ➜'}</button>`;
@@ -547,7 +581,11 @@ function completeStep(stars) {
   ui.quizWrong.clear();
   save();
   if (s.kind === 'final') return finishAdventure(a);
-  ui.clue = { letter: s.letter, stars };
+  const fact = factOf(s); let isNew = false;
+  if (fact) { state.facts ||= {}; if (!state.facts[s.id]) { state.facts[s.id] = { text: fact, placeId: a.placeId, at: new Date().toISOString() }; isNew = true; } save(); }
+  play('success');
+  if (stars) play('coins', { volume: 0.5, delay: 900 });
+  ui.clue = { letter: s.letter, stars, fact, isNew };
   render(); window.scrollTo(0, 0);
 }
 
@@ -556,9 +594,10 @@ function computeStats() {
   const done = doneAdvs();
   const byType = Object.fromEntries(Object.keys(TYPES).map(t => [t, 0]));
   done.forEach(a => byType[a.type]++);
-  return { count: done.length, byType, places: new Set(done.map(a => a.placeId)) };
+  return { count: done.length, byType, places: new Set(done.map(a => a.placeId)), facts: factCount(), streak: streak() };
 }
 function finishAdventure(a) {
+  const levelBefore = levelInfo(totalStars()).cur;
   a.status = 'done'; a.finishedAt = new Date().toISOString();
   state.currentId = null;
   const used = a.steps.map(s => s.id).filter(id => id !== 'final');
@@ -572,12 +611,28 @@ function finishAdventure(a) {
   save();
   ui.rewardFor = a.id; ui.souvenirURL = null;
   go(`#/album/${a.id}`);
-  setTimeout(confetti, 150);
+  play('applause', { volume: 0.6, delay: 600 });
+  setTimeout(confetti, 900);
+  if (a.earnedBadges.length) play('badge', { delay: 2200 });
+  const levelAfter = levelInfo(totalStars()).cur;
+  if (levelAfter.name !== levelBefore.name) setTimeout(() => showLevelUp(levelAfter), 3600);
+}
+
+function showLevelUp(lv) {
+  play('magic'); play('badge', { delay: 900 });
+  const modal = openModal(`<div class="levelup">
+    <div class="levelup-art">${mascot({ hat: 'explorer', mood: 'cheer' })}</div>
+    <p class="muted center">Nouveau grade !</p>
+    <h1 class="center">${lv.emoji} ${esc(lv.name)}</h1>
+    <p class="center">Vos aventures font de vous des explorateurs de plus en plus forts. Continuez !</p>
+    <button class="btn big block" id="lv-ok">Youpi !</button></div>`);
+  modal.querySelector('#lv-ok').onclick = closeModal;
+  confetti();
 }
 
 // ---------- Écran : Collection ----------
 function collection() {
-  const tabs = [['badges', '🏅 Badges'], ['album', '📸 Album'], ['calendrier', '📅 Calendrier']];
+  const tabs = [['badges', 'Badges'], ['savoir', 'Savoir'], ['album', 'Album'], ['calendrier', 'Calendrier']];
   let body = '';
   if (ui.collTab === 'badges') {
     const stars = totalStars(); const lv = levelInfo(stars);
@@ -590,6 +645,20 @@ function collection() {
       const n = c.badges.filter(b => state.badges[b.id]).length;
       return `<div class="section-title"><h3>${c.emoji} ${esc(c.name)}</h3><span class="small muted">${n}/${c.badges.length}</span></div>
       <div class="badge-grid">${c.badges.map(b => `<button class="badge ${state.badges[b.id] ? '' : 'locked'}" data-act="badge-info" data-id="${b.id}">${medal(b.id, c.id)}<small>${esc(b.name)}</small></button>`).join('')}</div>`;
+    }).join('')}`;
+  } else if (ui.collTab === 'savoir') {
+    const known = state.facts || {};
+    const totalAll = PLACES.reduce((n, p) => n + factTotal(p.id), 0);
+    const pct = Math.round(factCount() / totalAll * 100);
+    body = `
+    <div class="card level-card"><div class="em-ico">${icon('book')}</div><div style="flex:1" class="stack">
+      <b>Carnet du savoir · ${factCount()} / ${totalAll} secrets</b><div class="progress"><i style="width:${pct}%"></i></div>
+      <span class="small muted">Chaque mission réussie peut révéler un secret sur Antibes.</span></div></div>
+    ${PLACES.map(p => {
+      const facts = p.steps.filter(factOf); if (!facts.length) return '';
+      const got = facts.filter(st => known[st.id]);
+      return `<details class="card savoir" ${got.length ? '' : ''}><summary><span class="place-ico ${got.length === facts.length ? 'done' : ''}">${placeIcon(p.id)}</span><b>${esc(p.name)}</b><span class="pill">${got.length}/${facts.length}</span></summary>
+        ${facts.map(st => known[st.id] ? `<div class="fact-line">${esc(known[st.id].text)}</div>` : `<div class="fact-line locked">${icon('lock', 'ico-pill')} Secret à découvrir sur place…</div>`).join('')}</details>`;
     }).join('')}`;
   } else if (ui.collTab === 'album') {
     const list = doneAdvs();
@@ -642,7 +711,7 @@ function albumDetail(r) {
   <div class="top"><a class="icon-btn" href="#/collection" aria-label="Retour">←</a><h2>${reward ? 'Aventure réussie !' : 'Souvenir'}</h2></div>
   ${reward ? `
   <div class="hero stack center" style="align-items:center">
-    <div class="reward-art">${guideArt(a, 'cheer')}</div>
+    <div class="reward-scene"><div class="reward-chest">${chest()}</div><div class="reward-art">${guideArt(a, 'cheer')}</div></div>
     <h1>Bravo ${a.memberIds.map(memberById).filter(Boolean).map(m => esc(m.name)).join(', ') || 'les explorateurs'} !</h1>
     <p>Le mot secret était <b style="color:var(--sun)">${a.steps.at(-1).word}</b>. ${esc(a.guide.name)} est très fier de vous !</p>
     <span class="pill" style="color:var(--ink);font-size:18px">⭐ ${advStars(a)} étoiles gagnées</span>
@@ -651,6 +720,10 @@ function albumDetail(r) {
 
   ${badges.length ? `<div class="card stack"><h3>${reward ? 'Nouveaux badges !' : 'Badges gagnés'}</h3>
     <div class="badge-grid">${badges.map(b => `<div class="badge pop">${medal(b.id, b.collection)}<small>${esc(b.name)}</small></div>`).join('')}</div></div>` : ''}
+
+  ${a.steps.some(factOf) ? `<div class="card stack"><h3>${icon('book', 'ico-pill')} Secrets découverts</h3>
+    ${a.steps.filter(factOf).map(st => `<div class="fact-line">${esc(factOf(st))}</div>`).join('')}
+    <a class="small" style="color:var(--sea)" href="#/collection" data-act="coll-tab" data-id="savoir">Voir mon Carnet du savoir</a></div>` : ''}
 
   <div class="card stack">
     <h3>🖼️ Carte souvenir</h3>
@@ -714,10 +787,15 @@ function family() {
       <label class="btn ghost" style="cursor:pointer">⬆️ Importer<input type="file" accept="application/json,.json" class="sr" data-import></label></div>
   </div>
   <button class="btn danger block" data-act="reset">Tout effacer</button>
+  <div class="card row" style="align-items:center">
+    <span class="kind-ico">${icon(soundEnabled() ? 'speaker' : 'mute')}</span>
+    <div style="flex:1"><b>Sons et jingles</b><div class="small muted">${soundEnabled() ? 'Activés' : 'Coupés'}</div></div>
+    <button class="btn ${soundEnabled() ? 'ghost' : 'sea'}" style="min-height:48px" data-act="sound-toggle">${soundEnabled() ? 'Couper' : 'Activer'}</button>
+  </div>
   <div class="card stack">
     <h3>Univers graphique</h3>
     <a class="btn ghost block" href="#/kit">${icon('palette', 'ico-btn')} Bibliothèque visuelle</a>
-    <a class="btn ghost block" href="#/credits">${icon('scroll', 'ico-btn')} Crédits photos et licences</a>
+    <a class="btn ghost block" href="#/credits">${icon('scroll', 'ico-btn')} Crédits photos, sons et licences</a>
   </div>
   <p class="muted small center">Family Explorer · Antibes & Juan-les-Pins<br>Météo : Open-Meteo · Carte : © OpenStreetMap · Photos : Wikimedia Commons</p>`;
 }
@@ -796,8 +874,14 @@ function creditsScreen() {
   <div class="top"><a class="icon-btn" href="#/famille" aria-label="Retour">←</a><h1>Crédits</h1></div>
   <div class="card stack small">
     <p><b>Illustrations</b> (mascotte Pistou, objets, médailles, carte au trésor) : créations originales Family Explorer.</p>
-    <p><b>Photographies</b> : Wikimedia Commons, sous licences libres. Merci aux photographes !</p>
+    <p><b>Photographies et sons</b> : Wikimedia Commons, sous licences libres. Merci aux photographes et preneurs de son !</p>
   </div>
+  <h2>Sons et jingles</h2>
+  <div class="stack">${Object.entries(SOUNDS).map(([k, x]) => `
+    <div class="card credit-row"><button class="icon-btn" data-act="sound-test" data-k="${k}" aria-label="Écouter : ${esc(x.title)}">${icon('speaker')}</button>
+      <div class="stack" style="gap:2px"><b>${esc(x.title)}</b><span class="small">${esc(x.author)}</span>
+      <span class="small"><a href="${x.licenseUrl || x.page}" target="_blank" rel="noopener">${esc(x.license)}</a> · <a href="${x.page}" target="_blank" rel="noopener">source</a></span></div></div>`).join('')}</div>
+  <h2>Photographies</h2>
   <div class="stack">${Object.values(PHOTOS).map(p => `
     <div class="card credit-row"><img src="${p.src}" alt="" loading="lazy">
       <div class="stack" style="gap:2px"><b>${esc(p.title)}</b><span class="small">${esc(p.author)}</span>
@@ -826,7 +910,7 @@ const actions = {
     });
   },
   surprise: () => {
-    const sug = suggest(weatherKind(), hourNow(), explored(), Date.now() % 100000);
+    const sug = suggest(weatherKind(), hourNow(), explored(), Date.now() % 100000, youngestAge());
     draft = { placeId: sug.place.id, memberIds: state.family.members.map(m => m.id), duration: state.settings.duration || 45, difficulty: state.settings.difficulty || 'auto', type: 'surprise', weather: weatherKind() };
     doGenerate();
   },
@@ -834,9 +918,10 @@ const actions = {
   'd-member': d => { const s = new Set(draft.memberIds); s.has(d.id) ? s.delete(d.id) : s.add(d.id); draft.memberIds = state.family.members.map(m => m.id).filter(id => s.has(id)); render(); },
   generate: () => doGenerate(),
   reroll: () => { preview = null; doGenerate(); },
+  'sound-toggle': () => { state.settings.sound = !soundEnabled(); setSoundEnabled(state.settings.sound); save(); if (state.settings.sound) play('chime'); render(); },
   start: () => startAdventure(),
-  'intro-ok': () => { currentAdv().introSeen = true; save(); render(); window.scrollTo(0, 0); },
-  'clue-ok': () => { const a = currentAdv(); ui.clue = null; a.pos = Math.min(a.pos + 1, a.steps.length - 1); save(); render(); window.scrollTo(0, 0); },
+  'intro-ok': () => { play('page', { volume: 0.6 }); currentAdv().introSeen = true; save(); render(); window.scrollTo(0, 0); },
+  'clue-ok': () => { play('page', { volume: 0.5 }); const a = currentAdv(); ui.clue = null; a.pos = Math.min(a.pos + 1, a.steps.length - 1); save(); render(); window.scrollTo(0, 0); },
   complete: d => completeStep(Number(d.stars)),
   skip: () => {
     const modal = openModal(`<h2>Passer cette mission ?</h2><p class="muted">Vous gardez la lettre du code, mais sans étoile.</p>
@@ -846,7 +931,7 @@ const actions = {
   },
   quiz: d => {
     const a = currentAdv(); const s = a.steps[a.pos]; const i = Number(d.i);
-    if (i === s.quiz.answer) { s.answer = 'ok'; save(); } else ui.quizWrong.add(i);
+    if (i === s.quiz.answer) { s.answer = 'ok'; save(); play('chime'); } else { ui.quizWrong.add(i); play('wrong', { volume: 0.6 }); }
     render();
   },
   'count-ok': () => {
@@ -860,19 +945,19 @@ const actions = {
     let left = Number(d.s); const out = $('#timer'); el.disabled = true;
     ui.timer = { id: setInterval(() => {
       left--; if (out) out.textContent = left + 's';
-      if (left <= 0) { clearInterval(ui.timer.id); if (out) out.textContent = '🎉 Terminé !'; navigator.vibrate?.(300); el.disabled = false; el.textContent = '🔁 Relancer'; }
+      if (left <= 0) { clearInterval(ui.timer.id); play('bell'); if (out) out.textContent = '🎉 Terminé !'; navigator.vibrate?.(300); el.disabled = false; el.textContent = '🔁 Relancer'; }
     }, 1000) };
   },
   'code-ok': () => {
     const a = currentAdv(); const s = a.steps[a.pos];
     const v = $('#code-in').value.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z]/g, '');
-    if (v === s.word) completeStep(3); else { toast('Ce n\'est pas encore ça… Essayez un autre ordre !'); $('#code-in').select(); }
+    if (v === s.word) completeStep(3); else { play('wrong', { volume: 0.6 }); toast('Ce n\'est pas encore ça… Essayez un autre ordre !'); $('#code-in').select(); }
   },
   'code-pick': d => {
     const a = currentAdv(); const s = a.steps[a.pos];
-    if (d.w === s.word) completeStep(ui.quizWrong.size ? 2 : 3); else { ui.quizWrong.add(d.w); render(); }
+    if (d.w === s.word) completeStep(ui.quizWrong.size ? 2 : 3); else { play('wrong', { volume: 0.6 }); ui.quizWrong.add(d.w); render(); }
   },
-  'bonus-ok': () => { const a = currentAdv(); a.bonus.done = true; a.bonusDone = true; save(); toast('💎 Mission bonus réussie ! +2 ⭐'); render(); },
+  'bonus-ok': () => { play('coins', { volume: 0.6 }); play('chime', { delay: 500 }); const a = currentAdv(); a.bonus.done = true; a.bonusDone = true; save(); toast('💎 Mission bonus réussie ! +2 ⭐'); render(); },
   'bonus-hide': () => { ui.bonusHidden = true; render(); },
   'adv-menu': () => {
     const a = currentAdv();
@@ -886,7 +971,8 @@ const actions = {
     modal.querySelector('#am-pause').onclick = () => { closeModal(); go('#/accueil'); };
     modal.querySelector('#am-stop').onclick = () => { a.status = 'abandoned'; state.currentId = null; save(); closeModal(); go('#/accueil'); };
   },
-  'coll-tab': d => { ui.collTab = d.id; render(); },
+  'coll-tab': d => { ui.collTab = d.id; if (route().path !== 'collection') go('#/collection'); else render(); },
+  'sound-test': d => { const was = soundEnabled(); setSoundEnabled(true); play(d.k); setSoundEnabled(was); },
   'map-mode': d => { ui.mapMode = d.m; render(); },
   'map-pin': d => {
     const p = placeById(d.id); const ph = placePhoto(p.id); const done = explored().has(p.id);
@@ -952,6 +1038,7 @@ const actions = {
 
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
+  preloadSounds();
   if (!el || el.disabled) return;
   const fn = actions[el.dataset.act];
   if (fn) { e.preventDefault(); fn(el.dataset, el); }
@@ -962,7 +1049,7 @@ document.addEventListener('change', async e => {
   if (t.matches('[data-bind="family-name"]')) { state.family.name = t.value.trim(); save(); toast('✅ Enregistré'); }
   if (t.matches('[data-photo-input]') && t.files?.[0]) {
     const a = currentAdv(); if (!a) return;
-    toast('📷 Enregistrement de la photo…');
+    play('shutter'); toast('📷 Enregistrement de la photo…');
     try {
       const blob = await resizeImage(t.files[0]);
       const id = 'p-' + uid(); await putPhoto(id, blob); requestPersistence();
@@ -989,5 +1076,6 @@ if ('serviceWorker' in navigator) {
   const TAB_ICON = { accueil: 'backpack', explorer: 'map', aventure: 'compass', collection: 'trophy', famille: 'heart' };
   document.querySelectorAll('.tabbar a').forEach(a => { const em = a.querySelector('.em'); if (em) em.outerHTML = `<span class="em">${icon(TAB_ICON[a.dataset.tab])}</span>`; });
 }
+setSoundEnabled(state.settings.sound !== false);
 render();
 refreshWeather();

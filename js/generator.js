@@ -37,14 +37,15 @@ export function nearestPlace(lat, lng) {
 }
 
 // Avertissements selon météo / heure / lieu
-export function warningsFor(place, weather, hour) {
+export function warningsFor(place, weather, hour, members = []) {
   const w = [];
+  if (place?.minAge && members.some(m => m.age < place.minAge)) w.push({ icon: '🧒', text: `Ce lieu est plutôt adapté aux enfants de ${place.minAge} ans et plus.` });
   if (place?.safety) w.push({ icon: '🦺', text: place.safety });
   if (place?.hoursNote) w.push({ icon: '🕒', text: place.hoursNote });
   if (weather === 'rain' && place?.id === 'brague') w.push({ icon: '⚠️', text: 'Après de fortes pluies, la rivière peut monter vite : restez loin des berges.' });
-  if (weather === 'rain' && !place?.indoor) w.push({ icon: '🌧️', text: 'Il pleut : cirés et bottes ! Les musées Picasso, Peynet et d\'Archéologie sont de bonnes alternatives.' });
+  if (weather === 'rain' && !place?.indoor) w.push({ icon: '🌧️', text: 'Il pleut : cirés et bottes ! Posidonia et les musées Picasso, Peynet et d\'Archéologie sont de bonnes alternatives.' });
   if (weather === 'heat') w.push({ icon: '🧢', text: 'Forte chaleur : eau, chapeau, crème solaire et pauses à l\'ombre. Évitez 12 h – 16 h.' });
-  if (weather === 'wind' && place && ['garoupe', 'remparts', 'juan-plage', 'eilenroc', 'port-vauban', 'salis'].includes(place.id)) w.push({ icon: '💨', text: 'Vent fort : restez loin du bord de mer, des quais et des rochers.' });
+  if (weather === 'wind' && place && ['garoupe', 'remparts', 'juan-plage', 'eilenroc', 'port-vauban', 'salis', 'tirepoil', 'bastion-jaume'].includes(place.id)) w.push({ icon: '💨', text: 'Vent fort : restez loin du bord de mer, des quais et des rochers.' });
   if (place?.hours === 'museum' && (hour >= 18 || hour < 10)) w.push({ icon: '🔒', text: 'Le musée est probablement fermé à cette heure-ci.' });
   if (place?.hours === 'morning' && hour >= 13) w.push({ icon: '🔒', text: 'Le marché se tient le matin : il sera sans doute fermé.' });
   if (place?.hours === 'day' && (hour >= 19 || hour < 8)) w.push({ icon: '🌙', text: 'Ce lieu est peut-être fermé ou peu éclairé à cette heure-ci.' });
@@ -65,10 +66,10 @@ function fits(step, ctx) {
 function scoreStep(step, ctx, r) {
   let s = 1 + r() * 2.5;
   if (step.types?.includes(ctx.type)) s += 4;
-  if (step.local) s += 2.5;
+  if (step.local) s += 5; // priorité aux missions propres au lieu
   if (ctx.history.has(step.id)) s -= 4; // rejouable : on évite les missions déjà faites ici
   if (step.coop && ctx.memberCount >= 2) s += 1;
-  if (step.seasons || step.months) s += 2; // missions de saison mises en avant
+  if (step.seasons || step.months) s += 1; // missions de saison mises en avant
   return s;
 }
 
@@ -152,7 +153,7 @@ export function generate(opts) {
       : [];
     return {
       id: s.id, kind, title: s.title, easy, hard, quiz: s.quiz || null, timer: s.timer || null, coop: !!s.coop,
-      letter: scrambled[i], roles, done: false, stars: 0, answer: null, photoIds: [],
+      letter: scrambled[i], fact: s.fact || s.quiz?.explain || null, roles, done: false, stars: 0, answer: null, photoIds: [],
     };
   });
 
@@ -175,21 +176,22 @@ export function generate(opts) {
     memberIds: opts.members.map(m => m.id),
     levels: { easy: levels.easy.map(m => m.id), hard: levels.hard.map(m => m.id) },
     steps, bonus,
-    warnings: warningsFor(place, opts.weather, opts.hour),
+    warnings: warningsFor(place, opts.weather, opts.hour, opts.members),
     badge: place?.badge || null,
   };
 }
 
 // Suggestion du jour selon la météo, l'heure et les lieux pas encore explorés
-export function suggest(weather, hour, explored, seed) {
+export function suggest(weather, hour, explored, seed, youngest = 99) {
   const r = rng(seed);
   let cands = PLACES.filter(p => {
+    if (p.minAge && youngest < p.minAge) return false; // lieu trop difficile pour le plus jeune
     if (weather === 'rain') return p.indoor || p.id === 'vieil-antibes';
     if (p.hours === 'museum' && (hour >= 18 || hour < 10)) return false;
     if (p.hours === 'morning' && hour >= 13) return false;
     if (p.hours === 'day' && (hour >= 19 || hour < 8)) return false;
-    if (weather === 'heat') return ['pinede', 'exflora', 'juan-plage', 'eilenroc', 'picasso', 'archeo', 'thuret', 'brague', 'peynet', 'salis'].includes(p.id);
-    if (weather === 'wind') return !['garoupe', 'juan-plage', 'salis'].includes(p.id);
+    if (weather === 'heat') return ['pinede', 'exflora', 'juan-plage', 'eilenroc', 'picasso', 'archeo', 'thuret', 'brague', 'peynet', 'salis', 'gravette', 'bois-garoupe', 'vaugrenier', 'posidonia', 'hartung'].includes(p.id);
+    if (weather === 'wind') return !['garoupe', 'juan-plage', 'salis', 'tirepoil', 'bastion-jaume'].includes(p.id);
     return true;
   });
   if (!cands.length) cands = PLACES.filter(p => p.hours === 'always');
