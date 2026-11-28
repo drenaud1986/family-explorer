@@ -32,9 +32,13 @@ Une PWA doit être servie en **HTTPS**. Déposez le dossier tel quel sur n'impor
 | `js/data.js` | **Contenu de base** : 12 lieux, missions, 6 types d'aventures, personnages, mots-codes, badges |
 | `js/data-extra.js` | **Contenu ajouté** : 4 lieux (Villa Thuret, parc de la Brague, plage de la Salis, musée Peynet), missions supplémentaires, missions de saison, nouveaux scénarios |
 | `js/data-antibes2.js` | **Contenus de novembre 2026** : 11 nouveaux lieux (empreintes du jazz, Gravette, bastion Saint-Jaume, Saint-Bernardin, bois de la Garoupe, Hartung-Bergman, Posidonia, street art, Tire-Poil, chemin du Calvaire, Vaugrenier), missions ciblées et anecdotes « Le savais-tu ? » |
+| `js/data-antibes3.js` | **Lieux de la 3e vague** : 17 nouveaux lieux (cathédrale, places, squares, parcs, plages, ports, La sChOOl…), découpage Saint-Bernardin / place Nationale, fusions (bastion Saint-André, square Gould, Nomade), suppression de la Fondation Hartung-Bergman |
 | `js/sounds.js` | **Bruitages et jingles** enregistrés (13 sons, Wikimedia Commons, licences libres), lecture et réglage du son |
+| `css/theme.css` | **Thème v6** (refonte selon la maquette : ciel bleu, boutons jaunes, bulles, écran Aventures, victoire) |
+| `img/pistou/`, `img/badges/` | Illustrations fournies : Pistou (10 poses), Capitaine Barbe-Sel (6 poses), 29 badges découpés des planches |
+| `tools/ImageTool.cs` | Outil de découpe (icône, badges) utilisé depuis PowerShell |
 | `js/art.js` | **Kit graphique** SVG maison : mascotte Pistou (5 expressions, 11 costumes), 52 objets et pictogrammes, médailles, carte au trésor illustrée |
-| `js/photos.js` | **Photos réelles** (23, Wikimedia Commons) avec auteur, licence et source ; photos de repère par mission |
+| `js/photos.js` | **Photothèque** : 57 photos réelles (Wikimedia Commons) avec auteur, licence et source, et les **fiches photographiques des missions** (`STEP_DETAIL` : photo de référence, point du détail, zoom, indices progressifs) |
 | `js/generator.js` | Générateur d'aventures (lieu, âges, durée, type, météo, heure, missions déjà jouées) |
 | `js/app.js` | Écrans : Accueil, Explorer, Aventure, Collection, Famille + création / aperçu / souvenir |
 | `js/store.js` | Sauvegarde locale (localStorage + photos dans IndexedDB), export / import |

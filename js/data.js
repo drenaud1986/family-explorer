@@ -1,5 +1,6 @@
 // Family Explorer — contenu : lieux d'Antibes / Juan-les-Pins, missions, types d'aventures, badges.
 import { MORE_PLACES, MORE_PLACE_STEPS, FACTS, MORE_BADGES } from './data-antibes2.js';
+import { NEW_PLACES, MERGE_STEPS, RENAMES, MOVES, REMOVED_STEPS, REMOVED_PLACES } from './data-antibes3.js';
 import { EXTRA_PLACES, EXTRA_PLACE_STEPS, EXTRA_GENERIC_STEPS, EXTRA_BONUS_STEPS, EXTRA_STORIES, EXTRA_THEMES } from './data-extra.js';
 
 // Types d'aventure : treasure, detective, nature, photo, challenge, imaginary.
@@ -20,7 +21,7 @@ export const TYPES = {
   },
   detective: {
     name: 'Enquête de détective', emoji: '🔎', color: '#6C5CE7',
-    guide: { name: 'Inspectrice Loupe', emoji: '🕵️' },
+    guide: { name: 'Pistou le détective', emoji: '🦊' },
     titles: ["L'affaire de {place}", 'La disparition du chat Pistache', 'Le secret du monument', 'Qui a volé la cloche ?'],
     intros: [
       "Quelque chose de mystérieux s'est passé {at}. Personne n'a rien vu… sauf peut-être vous ! Réunissez les indices pour résoudre l'affaire.",
@@ -31,10 +32,10 @@ export const TYPES = {
   },
   nature: {
     name: 'Explorateur de la nature', emoji: '🌿', color: '#3E9B5A',
-    guide: { name: 'Professeure Fougère', emoji: '🦉' },
+    guide: { name: 'Pistou le naturaliste', emoji: '🦊' },
     titles: ['Les botanistes secrets', 'Le carnet du naturaliste', 'La mission des petites bêtes', 'Les gardiens de {place}'],
     intros: [
-      "La Professeure Fougère a perdu les pages de son carnet {at}. Chaque observation vous aidera à le reconstituer.",
+      "Pistou a perdu les pages de son carnet de naturaliste {at}. Chaque observation vous aidera à le reconstituer.",
       "Les plantes et les animaux {at} ont des secrets. Saurez-vous les découvrir sans rien abîmer ?",
     ],
     lines: ['Regardez, écoutez, sentez…', 'La nature adore les observateurs patients.', 'Votre carnet se remplit !', 'Bravo, jeunes naturalistes !'],
@@ -42,21 +43,21 @@ export const TYPES = {
   },
   photo: {
     name: 'Défi photo', emoji: '📸', color: '#E0603A',
-    guide: { name: 'Zoom le reporter', emoji: '🎥' },
+    guide: { name: 'Pistou le reporter', emoji: '🦊' },
     titles: ['Reportage à {place}', "L'œil du photographe", 'Le grand safari photo'],
     intros: [
       "Le journal d'Antibes cherche des reporters ! Votre mission : rapporter les plus belles images {at}.",
-      "Zoom prépare une exposition secrète. Il a besoin de vos photos prises {at}.",
+      "Pistou prépare une exposition secrète. Il a besoin de vos photos prises {at}.",
     ],
     lines: ['Cadrez bien !', 'Cherchez l\'angle original…', 'Superbe cliché !', 'L\'exposition prend forme !'],
     final: "L'exposition",
   },
   challenge: {
     name: 'Défis et challenges', emoji: '⚡', color: '#0E6E8C',
-    guide: { name: 'Coach Tornade', emoji: '🏅' },
+    guide: { name: 'Pistou le coach', emoji: '🦊' },
     titles: ['Les jeux de {place}', 'Défis en folie', 'Le parcours des champions'],
     intros: [
-      "Coach Tornade a préparé une série de défis {at}. Rires garantis, médaille à la clé !",
+      "Pistou a préparé une série de défis {at}. Rires garantis, médaille à la clé !",
       "Bienvenue aux jeux olympiques de la famille ! Les épreuves se déroulent {at}.",
     ],
     lines: ['Prêts ? Partez !', 'On s\'entraide, c\'est la règle !', 'Quelle énergie !', 'Champions !'],
@@ -65,16 +66,16 @@ export const TYPES = {
   imaginary: {
     name: 'Aventure imaginaire', emoji: '🎭', color: '#C0397B',
     themes: [
-      { id: 'pirate', name: 'Pirates', guide: { name: 'Capitaine Corail', emoji: '🦜' },
-        title: 'Les pirates de {place}', intro: "Vous êtes l'équipage du Capitaine Corail ! Votre navire a accosté {at}. Il faut retrouver la boussole magique avant la marée." },
-      { id: 'archeo', name: 'Archéologues', guide: { name: 'Docteur Amphore', emoji: '🏺' },
+      { id: 'pirate', name: 'Pirates', guide: { name: 'Capitaine Barbe-Sel', emoji: '🏴‍☠️' },
+        title: 'Les pirates de {place}', intro: "Vous êtes l'équipage du Capitaine Barbe-Sel ! Votre navire a accosté {at}. Il faut retrouver la boussole magique avant la marée." },
+      { id: 'archeo', name: 'Archéologues', guide: { name: 'Pistou l\'archéologue', emoji: '🦊' },
         title: 'Les archéologues du temps perdu', intro: "Des archéologues pensent qu'un objet de l'antique Antipolis est caché {at}. Vous êtes leur équipe de fouille !" },
-      { id: 'chevalier', name: 'Chevaliers', guide: { name: 'Dame Bastille', emoji: '🛡️' },
+      { id: 'chevalier', name: 'Chevaliers', guide: { name: 'Pistou le chevalier', emoji: '🦊' },
         title: 'La quête des chevaliers', intro: "Le royaume a besoin de chevaliers courageux. Votre quête commence {at}." },
-      { id: 'agent', name: 'Agents secrets', guide: { name: 'Agent 00Soleil', emoji: '🕶️' },
+      { id: 'agent', name: 'Agents secrets', guide: { name: 'Pistou, agent secret', emoji: '🦊' },
         title: 'Opération {place}', intro: "Message codé reçu : une mission top secrète vous attend {at}. Restez discrets !" },
-      { id: 'temps', name: 'Voyageurs du temps', guide: { name: 'Professeur Chrono', emoji: '⏳' },
-        title: 'Les explorateurs temporels', intro: "La machine à voyager dans le temps du Professeur Chrono s'est posée {at}. Il faut retrouver ses pièces éparpillées à travers les siècles !" },
+      { id: 'temps', name: 'Voyageurs du temps', guide: { name: 'Pistou, voyageur du temps', emoji: '🦊' },
+        title: 'Les explorateurs temporels', intro: "La machine à voyager dans le temps de Pistou s'est posée {at}. Il faut retrouver ses pièces éparpillées à travers les siècles !" },
     ],
     lines: ['Entrez dans l\'histoire !', 'Votre imagination est votre super-pouvoir.', 'L\'aventure continue…', 'Héros légendaires !'],
     final: 'Le grand final',
@@ -103,7 +104,7 @@ const ALL = ['treasure', 'detective', 'nature', 'photo', 'challenge', 'imaginary
 
 export const PLACES = [
   {
-    id: 'vieil-antibes', name: 'Vieil Antibes', emoji: '🏰', area: 'Antibes', lat: 43.5808, lng: 7.1280,
+    id: 'vieil-antibes', name: 'Vieil Antibes', emoji: '🏰', area: 'Antibes', lat: 43.5812944, lng: 7.1269512,
     at: 'dans une ruelle du Vieil Antibes', hours: 'always', tags: ['histoire', 'quartier'], priority: 1,
     safety: 'Ruelles parfois ouvertes aux voitures de livraison : restez groupés.',
     badge: { id: 'q-vieil-antibes', name: 'Explorateur du Vieil Antibes', emoji: '🏰' },
@@ -142,7 +143,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'fort-carre', name: 'Fort Carré', emoji: '⭐', area: 'Antibes', lat: 43.5885, lng: 7.1262,
+    id: 'fort-carre', name: 'Fort Carré', emoji: '⭐', area: 'Antibes', lat: 43.5903395, lng: 7.1276191,
     at: 'au pied du Fort Carré', hours: 'day', hoursNote: 'Visites du fort selon horaires : à vérifier avant de partir.', tags: ['histoire'],
     safety: 'Murs et talus hauts : on ne grimpe pas, on reste sur les chemins.',
     badge: { id: 'q-fort-carre', name: 'Gardien du Fort Carré', emoji: '⭐' },
@@ -175,7 +176,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'port-vauban', name: 'Port Vauban & le Nomade', emoji: '⚓', area: 'Antibes', lat: 43.5858, lng: 7.1290,
+    id: 'port-vauban', name: 'Port Vauban & le Nomade', emoji: '⚓', area: 'Antibes', lat: 43.5867908, lng: 7.1286660,
     at: 'sur les quais du Port Vauban', hours: 'always', tags: ['mer', 'art'],
     safety: 'Quais sans barrière : on marche loin du bord et on tient la main des petits.',
     badge: { id: 'q-port-vauban', name: 'Capitaine du Port Vauban', emoji: '⚓' },
@@ -208,7 +209,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'exflora', name: 'Parc Exflora', emoji: '🌺', area: 'Juan-les-Pins', lat: 43.5668, lng: 7.0985,
+    id: 'exflora', name: 'Parc Exflora', emoji: '🌺', area: 'Juan-les-Pins', lat: 43.5717575, lng: 7.0882720,
     at: 'dans les jardins du parc Exflora', hours: 'day', hoursNote: 'Parc ouvert en journée : horaires à vérifier.', tags: ['nature', 'jardin'],
     safety: 'Bassins et canaux : on ne s\'approche pas seul du bord de l\'eau.',
     badge: { id: 'q-exflora', name: 'Botaniste d\'Exflora', emoji: '🌺' },
@@ -239,7 +240,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'pinede', name: 'Jardin de la Pinède', emoji: '🌲', area: 'Juan-les-Pins', lat: 43.5687, lng: 7.1112,
+    id: 'pinede', name: 'Jardin de la Pinède', emoji: '🌲', area: 'Juan-les-Pins', lat: 43.5672179, lng: 7.1150882,
     at: 'sous les pins de la Pinède de Juan-les-Pins', hours: 'day', tags: ['nature', 'jeux'],
     safety: 'Avenue proche : on reste dans le jardin.',
     badge: { id: 'q-pinede', name: 'Écureuil de la Pinède', emoji: '🐿️' },
@@ -270,7 +271,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'garoupe', name: 'Cap d\'Antibes & Garoupe', emoji: '🗼', area: 'Cap d\'Antibes', lat: 43.5640, lng: 7.1335,
+    id: 'garoupe', name: 'Cap d\'Antibes & Garoupe', emoji: '🗼', area: 'Cap d\'Antibes', lat: 43.5643396, lng: 7.1327155,
     at: 'sur le plateau de la Garoupe', hours: 'day', tags: ['nature', 'mer', 'vue'],
     safety: 'Sentier du littoral : falaises et rochers glissants. On reste sur le chemin, loin du bord, surtout par vent fort.',
     badge: { id: 'q-garoupe', name: 'Explorateur du littoral', emoji: '🗼' },
@@ -298,7 +299,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'marche', name: 'Marché provençal', emoji: '🍅', area: 'Antibes', lat: 43.5812, lng: 7.1283,
+    id: 'marche', name: 'Marché provençal', emoji: '🍅', area: 'Antibes', lat: 43.5809316, lng: 7.1275759,
     at: 'sous la halle du marché provençal', hours: 'morning', hoursNote: 'Le marché a lieu le matin (fermé certains lundis hors saison).', tags: ['quartier', 'goût'],
     safety: 'Beaucoup de monde : on choisit un point de rendez-vous en cas de séparation.',
     badge: { id: 'q-marche', name: 'Fin gourmet du marché', emoji: '🍅' },
@@ -323,7 +324,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'remparts', name: 'Les remparts', emoji: '🧱', area: 'Antibes', lat: 43.5797, lng: 7.1298,
+    id: 'remparts', name: 'Les remparts', emoji: '🧱', area: 'Antibes', lat: 43.5800560, lng: 7.1280790,
     at: 'le long des remparts face à la mer', hours: 'always', tags: ['histoire', 'mer', 'vue'],
     safety: 'Parapets hauts : on ne grimpe jamais dessus.',
     badge: { id: 'q-remparts', name: 'Sentinelle des remparts', emoji: '🧱' },
@@ -346,7 +347,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'picasso', name: 'Musée Picasso', emoji: '🎨', area: 'Antibes', lat: 43.5806, lng: 7.1289, indoor: true, noPhoto: true,
+    id: 'picasso', name: 'Musée Picasso', emoji: '🎨', area: 'Antibes', lat: 43.5807090, lng: 7.1282596, indoor: true, noPhoto: true,
     at: 'dans le château Grimaldi, au musée Picasso', hours: 'museum', hoursNote: 'Musée payant, fermé le lundi : horaires à vérifier.', tags: ['art', 'histoire', 'pluie'],
     safety: 'On ne touche pas les œuvres, on chuchote.',
     badge: { id: 'q-picasso', name: 'Artiste du château Grimaldi', emoji: '🎨' },
@@ -371,7 +372,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'archeo', name: 'Musée d\'Archéologie', emoji: '🏺', area: 'Antibes', lat: 43.5780, lng: 7.1300, indoor: true, noPhoto: true,
+    id: 'archeo', name: 'Musée d\'Archéologie', emoji: '🏺', area: 'Antibes', lat: 43.5772935, lng: 7.1260450, indoor: true, noPhoto: true,
     at: 'dans le bastion Saint-André, au musée d\'Archéologie', hours: 'museum', hoursNote: 'Fermé le lundi : horaires à vérifier.', tags: ['histoire', 'pluie'],
     safety: 'On ne touche pas les vitrines.',
     badge: { id: 'q-archeo', name: 'Archéologue d\'Antipolis', emoji: '🏺' },
@@ -396,7 +397,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'eilenroc', name: 'Villa Eilenroc', emoji: '🌹', area: 'Cap d\'Antibes', lat: 43.5512, lng: 7.1205,
+    id: 'eilenroc', name: 'Villa Eilenroc', emoji: '🌹', area: 'Cap d\'Antibes', lat: 43.5456105, lng: 7.1302910,
     at: 'dans les jardins de la villa Eilenroc', hours: 'day', hoursNote: 'Ouverture selon les saisons : à vérifier avant de partir.', tags: ['jardin', 'histoire', 'mer'],
     safety: 'Bord de mer rocheux en contrebas : restez dans les allées.',
     badge: { id: 'q-eilenroc', name: 'Jardinier d\'Eilenroc', emoji: '🌹' },
@@ -418,7 +419,7 @@ export const PLACES = [
     ],
   },
   {
-    id: 'juan-plage', name: 'Plages de Juan-les-Pins', emoji: '🏖️', area: 'Juan-les-Pins', lat: 43.5665, lng: 7.1150,
+    id: 'juan-plage', name: 'Plages de Juan-les-Pins', emoji: '🏖️', area: 'Juan-les-Pins', lat: 43.5666359, lng: 7.1138352,
     at: 'sur la plage de Juan-les-Pins', hours: 'always', tags: ['mer', 'nature', 'jeux'],
     safety: 'Baignade uniquement avec un adulte, et jamais par mer agitée.',
     badge: { id: 'q-juan-plage', name: 'Ami de la mer', emoji: '🏖️' },
@@ -508,6 +509,17 @@ for (const [t, s] of Object.entries(EXTRA_STORIES)) { TYPES[t].titles.push(...s.
 TYPES.imaginary.themes.push(...EXTRA_THEMES);
 PLACES.push(...MORE_PLACES);
 for (const [id, steps] of Object.entries(MORE_PLACE_STEPS)) PLACES.find(p => p.id === id)?.steps.push(...steps);
+// 3e vague : suppressions, nouveaux lieux, fusions, renommages, missions déplacées
+for (const id of REMOVED_PLACES) { const i = PLACES.findIndex(p => p.id === id); if (i >= 0) PLACES.splice(i, 1); }
+PLACES.push(...NEW_PLACES);
+for (const [id, steps] of Object.entries(MERGE_STEPS)) PLACES.find(p => p.id === id)?.steps.push(...steps);
+for (const [id, r] of Object.entries(RENAMES)) { const p = PLACES.find(x => x.id === id); if (p) Object.assign(p, r); }
+for (const [sid, from, to] of MOVES) {
+  const f = PLACES.find(p => p.id === from), t = PLACES.find(p => p.id === to);
+  const i = f ? f.steps.findIndex(s => s.id === sid) : -1;
+  if (f && t && i >= 0) t.steps.push(...f.steps.splice(i, 1));
+}
+for (const p of PLACES) p.steps = p.steps.filter(s => !REMOVED_STEPS.includes(s.id));
 for (const p of PLACES) for (const st of p.steps) if (FACTS[st.id] && !st.fact) st.fact = FACTS[st.id];
 for (const st of GENERIC_STEPS) if (FACTS[st.id] && !st.fact) st.fact = FACTS[st.id];
 

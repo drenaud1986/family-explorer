@@ -6,7 +6,7 @@ const ALL = ['treasure', 'detective', 'nature', 'photo', 'challenge', 'imaginary
 
 export const MORE_PLACES = [
   {
-    id: 'jazz', name: 'Les empreintes du jazz', emoji: '🎷', area: 'Juan-les-Pins', lat: 43.5672, lng: 7.1118,
+    id: 'jazz', name: 'Les empreintes du jazz', emoji: '🎷', area: 'Juan-les-Pins', lat: 43.5676223, lng: 7.1134081,
     at: 'sur le boulevard Baudoin, devant les empreintes des géants du jazz', hours: 'always', tags: ['culture', 'musique', 'quartier'],
     safety: 'Boulevard animé : on reste sur le trottoir côté Pinède.',
     badge: { id: 'q-jazz', name: 'Musicien de Juan', emoji: '🎷' },
@@ -34,7 +34,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'gravette', name: 'Plage de la Gravette', emoji: '🪣', area: 'Antibes', lat: 43.5835, lng: 7.1283,
+    id: 'gravette', name: 'Plage de la Gravette', emoji: '🪣', area: 'Antibes', lat: 43.5827176, lng: 7.1289788,
     at: 'sur la petite plage de la Gravette, sous les remparts', hours: 'always', tags: ['mer', 'jeux', 'petits'],
     safety: 'Baignade uniquement avec un adulte. Poste de secours en été.',
     badge: { id: 'q-gravette', name: 'Petit crabe de la Gravette', emoji: '🦀' },
@@ -59,7 +59,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'bastion-jaume', name: 'Bastion Saint-Jaume', emoji: '🗿', area: 'Antibes', lat: 43.5862, lng: 7.1297,
+    id: 'bastion-jaume', name: 'Bastion Saint-Jaume', emoji: '🗿', area: 'Antibes', lat: 43.5848063, lng: 7.1305759,
     at: 'sur la terrasse du bastion Saint-Jaume, au pied du Nomade', hours: 'always', tags: ['art', 'mer', 'histoire'],
     safety: 'Bord de quai : on ne s\'approche pas du bord, surtout par vent fort.',
     badge: { id: 'q-bastion-jaume', name: 'Ami du Nomade', emoji: '🗿' },
@@ -83,7 +83,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'bernardin', name: 'Chapelle Saint-Bernardin & place Nationale', emoji: '🔔', area: 'Antibes', lat: 43.5813, lng: 7.1262,
+    id: 'bernardin', name: 'Chapelle Saint-Bernardin & place Nationale', emoji: '🔔', area: 'Antibes', lat: 43.5817960, lng: 7.1248924,
     at: 'entre la chapelle Saint-Bernardin et la place Nationale', hours: 'day', hoursNote: 'Chapelle gratuite, fermée le dimanche.', tags: ['histoire', 'quartier'],
     safety: 'Dans la chapelle, on parle tout bas.',
     badge: { id: 'q-bernardin', name: 'Gardien de la chapelle', emoji: '🔔' },
@@ -106,7 +106,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'bois-garoupe', name: 'Bois de la Garoupe', emoji: '🌲', area: 'Cap d\'Antibes', lat: 43.5655, lng: 7.1320,
+    id: 'bois-garoupe', name: 'Bois de la Garoupe', emoji: '🌲', area: 'Cap d\'Antibes', lat: 43.5661839, lng: 7.1320851,
     at: 'sous les pins du bois de la Garoupe', hours: 'day', tags: ['nature', 'forêt'],
     safety: 'Forêt protégée : on reste sur les chemins et on ne fait jamais de feu.',
     badge: { id: 'q-bois-garoupe', name: 'Gardien de la forêt', emoji: '🌲' },
@@ -154,7 +154,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'posidonia', name: 'Posidonia – Espace Mer et Littoral', emoji: '🐟', area: 'Cap d\'Antibes', lat: 43.5545, lng: 7.1185, indoor: true, noPhoto: true,
+    id: 'posidonia', name: 'Posidonia – Espace Mer et Littoral', emoji: '🐟', area: 'Cap d\'Antibes', lat: 43.5490783, lng: 7.1191359, indoor: true, noPhoto: true,
     at: 'à Posidonia, dans l\'ancienne batterie du Graillon', hours: 'museum',
     hoursNote: 'Payant (gratuit pour les moins de 6 ans, tarif famille). Fermé le lundi : horaires à vérifier.', tags: ['mer', 'nature', 'pluie'],
     safety: 'Espace d\'exposition : on marche, on ne court pas.',
@@ -178,7 +178,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'street-art', name: 'Le street art, musée à ciel ouvert', emoji: '🎨', area: 'Antibes', lat: 43.5822, lng: 7.1215,
+    id: 'street-art', name: 'Le street art, musée à ciel ouvert', emoji: '🎨', area: 'Antibes', lat: 43.5794910, lng: 7.1181187,
     at: 'dans les rues d\'Antibes, devant les fresques du festival Coul\'Heures d\'Automne', hours: 'always', tags: ['art', 'quartier'],
     hoursNote: 'Les fresques sont dans plusieurs quartiers : l\'Office de tourisme propose des parcours.',
     safety: 'Rues avec voitures : on regarde les fresques depuis le trottoir.',
@@ -205,7 +205,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'tirepoil', name: 'Sentier de Tire-Poil', emoji: '💨', area: 'Cap d\'Antibes', lat: 43.5590, lng: 7.1395, minAge: 7,
+    id: 'tirepoil', name: 'Sentier de Tire-Poil', emoji: '💨', area: 'Cap d\'Antibes', lat: 43.5552933, lng: 7.1396871, minAge: 7,
     at: 'sur le sentier de Tire-Poil, le long des rochers du Cap', hours: 'day',
     hoursNote: 'Environ 5 km (1 h 30 à 2 h) de la plage de la Garoupe à la villa Eilenroc. Plutôt pour les 7 ans et plus.', tags: ['nature', 'mer', 'randonnée'],
     safety: 'Chemin rocheux : chaussures fermées, jamais par vent fort ou mer agitée, on reste sur le sentier.',
@@ -234,7 +234,7 @@ export const MORE_PLACES = [
     ],
   },
   {
-    id: 'calvaire', name: 'Chemin du Calvaire', emoji: '⛰️', area: 'Cap d\'Antibes', lat: 43.5685, lng: 7.1330,
+    id: 'calvaire', name: 'Chemin du Calvaire', emoji: '⛰️', area: 'Cap d\'Antibes', lat: 43.5653649, lng: 7.1328758,
     at: 'sur le chemin du Calvaire, entre la Salis et la Garoupe', hours: 'day', tags: ['histoire', 'nature', 'randonnée'],
     hoursNote: 'Montée en pierre, gratuite, ouverte tous les jours. Non accessible aux poussettes.',
     safety: 'Montée raide par endroits : on monte à son rythme, avec de l\'eau.',
@@ -257,11 +257,11 @@ export const MORE_PLACES = [
       { id: 'cv-vue', kind: 'photo', types: ['photo', 'nature'], title: 'La récompense du sommet',
         easy: 'Au sommet, photographie la vue sur la mer.',
         hard: 'Au sommet, photographie à la fois le phare et la mer.',
-        fact: 'Le plateau de la Garoupe est à 103 m d\'altitude : c\'est le point le plus haut du Cap d\'Antibes.' },
+        fact: 'Le plateau de la Garoupe culmine à 75 m : c\'est le point le plus haut du Cap d\'Antibes.' },
     ],
   },
   {
-    id: 'vaugrenier', name: 'Parc de Vaugrenier', emoji: '🦆', area: 'Villeneuve-Loubet', lat: 43.6270, lng: 7.1220,
+    id: 'vaugrenier', name: 'Parc de Vaugrenier', emoji: '🦆', area: 'Villeneuve-Loubet', lat: 43.6253348, lng: 7.1221276,
     at: 'au bord de l\'étang du parc de Vaugrenier', hours: 'day', tags: ['nature', 'oiseaux', 'jeux'],
     hoursNote: 'Parc départemental gratuit, à la limite d\'Antibes (commune de Villeneuve-Loubet).',
     safety: 'Étang : on reste sur les chemins et on ne nourrit pas les oiseaux.',
@@ -379,7 +379,7 @@ export const FACTS = {
   'pc-visage': 'Picasso a peint au château pendant deux mois, en 1946. Il a laissé 23 tableaux et 44 dessins à la ville.',
   'pc-terrasse': 'Sur la terrasse du musée, les sculptures sont de l\'artiste Germaine Richier.',
   'ar-epave': 'Certaines amphores du musée ont plus de 2 000 ans : elles transportaient du vin et de l\'huile dans les bateaux romains.',
-  'ga-iles': 'Le plateau de la Garoupe est à 103 m d\'altitude : c\'est le point le plus haut du Cap d\'Antibes.',
+  'ga-iles': 'Le plateau de la Garoupe culmine à 75 m : c\'est le point le plus haut du Cap d\'Antibes. Le premier phare y a été construit en 1836.',
   'ga-chapelle': 'Environ 300 ex-votos décorent la chapelle de la Garoupe. Le plus ancien date de 1506 !',
   'ei-roses': 'Le parc de la villa Eilenroc fait 11 hectares. Sa roseraie est l\'une des plus belles de la Côte d\'Azur.',
   'ei-olivier': 'L\'oliveraie d\'Eilenroc a été plantée en 1997. On y trouve le Blanquetier d\'Antibes, une variété d\'olive d\'ici !',

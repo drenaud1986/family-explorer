@@ -1,13 +1,13 @@
 // Service worker : application disponible hors connexion
-const VERSION = 'fe-v4';
+const VERSION = 'fe-v7';
 const SHELL = `shell-${VERSION}`;
 const RUNTIME = 'runtime-v1';
 const TILES = 'tiles-v1';
 const MAX_TILES = 600;
 
 const FILES = [
-  './', './index.html', './manifest.webmanifest', './css/app.css',
-  './js/app.js', './js/data.js', './js/data-extra.js', './js/generator.js', './js/store.js', './js/souvenir.js', './js/art.js', './js/photos.js', './js/sounds.js', './js/data-antibes2.js',
+  './', './index.html', './manifest.webmanifest', './css/app.css', './css/theme.css',
+  './js/app.js', './js/data.js', './js/data-extra.js', './js/generator.js', './js/store.js', './js/souvenir.js', './js/art.js', './js/photos.js', './js/sounds.js', './js/data-antibes2.js', './js/data-antibes3.js',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png', './icons/apple-touch-icon.png',
 ];
 const EXTRA = [

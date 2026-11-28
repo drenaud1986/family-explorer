@@ -45,7 +45,7 @@ export function warningsFor(place, weather, hour, members = []) {
   if (weather === 'rain' && place?.id === 'brague') w.push({ icon: '⚠️', text: 'Après de fortes pluies, la rivière peut monter vite : restez loin des berges.' });
   if (weather === 'rain' && !place?.indoor) w.push({ icon: '🌧️', text: 'Il pleut : cirés et bottes ! Posidonia et les musées Picasso, Peynet et d\'Archéologie sont de bonnes alternatives.' });
   if (weather === 'heat') w.push({ icon: '🧢', text: 'Forte chaleur : eau, chapeau, crème solaire et pauses à l\'ombre. Évitez 12 h – 16 h.' });
-  if (weather === 'wind' && place && ['garoupe', 'remparts', 'juan-plage', 'eilenroc', 'port-vauban', 'salis', 'tirepoil', 'bastion-jaume'].includes(place.id)) w.push({ icon: '💨', text: 'Vent fort : restez loin du bord de mer, des quais et des rochers.' });
+  if (weather === 'wind' && place && ['garoupe', 'remparts', 'juan-plage', 'eilenroc', 'port-vauban', 'salis', 'tirepoil', 'bastion-jaume', 'ilette', 'ondes', 'ponteil', 'gallice'].includes(place.id)) w.push({ icon: '💨', text: 'Vent fort : restez loin du bord de mer, des quais et des rochers.' });
   if (place?.hours === 'museum' && (hour >= 18 || hour < 10)) w.push({ icon: '🔒', text: 'Le musée est probablement fermé à cette heure-ci.' });
   if (place?.hours === 'morning' && hour >= 13) w.push({ icon: '🔒', text: 'Le marché se tient le matin : il sera sans doute fermé.' });
   if (place?.hours === 'day' && (hour >= 19 || hour < 8)) w.push({ icon: '🌙', text: 'Ce lieu est peut-être fermé ou peu éclairé à cette heure-ci.' });
@@ -190,8 +190,8 @@ export function suggest(weather, hour, explored, seed, youngest = 99) {
     if (p.hours === 'museum' && (hour >= 18 || hour < 10)) return false;
     if (p.hours === 'morning' && hour >= 13) return false;
     if (p.hours === 'day' && (hour >= 19 || hour < 8)) return false;
-    if (weather === 'heat') return ['pinede', 'exflora', 'juan-plage', 'eilenroc', 'picasso', 'archeo', 'thuret', 'brague', 'peynet', 'salis', 'gravette', 'bois-garoupe', 'vaugrenier', 'posidonia', 'hartung'].includes(p.id);
-    if (weather === 'wind') return !['garoupe', 'juan-plage', 'salis', 'tirepoil', 'bastion-jaume'].includes(p.id);
+    if (weather === 'heat') return ['pinede', 'exflora', 'juan-plage', 'eilenroc', 'picasso', 'archeo', 'thuret', 'brague', 'peynet', 'salis', 'gravette', 'bois-garoupe', 'vaugrenier', 'posidonia', 'semboules', 'estagnol', 'bouillides', 'albert1', 'ponteil', 'ondes'].includes(p.id);
+    if (weather === 'wind') return !['garoupe', 'juan-plage', 'salis', 'tirepoil', 'bastion-jaume', 'ilette', 'ondes', 'ponteil', 'gallice'].includes(p.id);
     return true;
   });
   if (!cands.length) cands = PLACES.filter(p => p.hours === 'always');

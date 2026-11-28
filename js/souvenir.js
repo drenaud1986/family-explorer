@@ -1,7 +1,7 @@
 // Carte souvenir : image PNG avec titre, date, participants, photos et badges
 import { photoURL } from './store.js';
 import { ALL_BADGES, TYPES } from './data.js';
-import { medal, guideArt } from './art.js';
+import { medal, badgeImage, characterSrc, guideWho } from './art.js';
 const svgImg = svg => loadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
 
 const loadImg = src => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
@@ -66,7 +66,7 @@ export async function renderSouvenir(adv, members) {
     });
   } else {
     ctx.fillStyle = '#FFE7A8'; roundRect(ctx, gx, y, gw, gh, 32); ctx.fill();
-    const m = await svgImg(guideArt(adv, 'cheer', { size: 460 })); if (m) ctx.drawImage(m, W / 2 - 230, y + 40, 460, 460);
+    const m = await loadImg(characterSrc(guideWho(adv), 'cheer')); if (m) { const k = Math.min(440 / m.width, 440 / m.height); ctx.drawImage(m, W / 2 - m.width * k / 2, y + gh / 2 - m.height * k / 2, m.width * k, m.height * k); }
   }
   y += gh + 70;
 
@@ -82,7 +82,7 @@ export async function renderSouvenir(adv, members) {
     ctx.font = `76px ${body}`;
     const step = Math.min(130, (W - 2 * P) / badges.length);
     const x0 = W / 2 - (step * (badges.length - 1)) / 2;
-    const imgs2 = await Promise.all(badges.map(b => svgImg(medal(b.id, b.collection, '', 100))));
+    const imgs2 = await Promise.all(badges.map(b => badgeImage(b.id) ? loadImg(badgeImage(b.id)) : svgImg(medal(b.id, b.collection, '', 100))));
     imgs2.forEach((im, i) => im && ctx.drawImage(im, x0 + i * step - 46, y - 10, 92, 101));
     y += 96;
     ctx.font = `700 28px ${body}`; ctx.fillStyle = '#4A5866';

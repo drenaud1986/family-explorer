@@ -1,3 +1,5 @@
+import { ALL_BADGES, PLACES } from './data.js';
+import { placePhoto } from './photos.js';
 // Family Explorer — kit graphique maison (SVG) : mascotte Pistou, objets, pictogrammes, médailles, carte au trésor.
 // Un seul style : trait encre arrondi, aplats de la palette, aucune ressource externe ni licence à gérer.
 
@@ -72,6 +74,10 @@ const I = {
   mute: `<path d="M10 24h10l14-12v40L20 40H10z" fill="${C.grey}"/><path d="M42 24l14 16M56 24L42 40" stroke-width="4"/>`,
   book: `<path d="M8 14q12-4 24 4 12-8 24-4v38q-12-4-24 4-12-8-24-4z" fill="${C.cream}"/><path d="M32 18v38" /><path d="M14 24q8-2 13 2M14 32q8-2 13 2M37 26q5-4 13-2M37 34q5-4 13-2" stroke-width="2"/>`,
   flame: `<path d="M32 6q4 12 12 18 8 8 6 18-2 14-18 16-16-2-18-16-2-10 6-16 0 8 6 10-2-16 6-30z" fill="${C.orange}"/><path d="M32 30q8 8 6 16-2 6-6 6-6 0-7-6 0-8 7-16z" fill="${C.sun}"/>`,
+  house: `<path d="M8 30L32 10l24 20" stroke-width="4"/><path d="M14 28v26h36V28L32 13z" fill="${C.sun}"/><rect x="27" y="38" width="10" height="16" rx="2" fill="${C.terra}"/><path d="M8 30L32 10l24 20" stroke="${C.terra}" stroke-width="5"/>`,
+  person: `<circle cx="32" cy="20" r="11" fill="${C.fox}"/><path d="M12 56q0-20 20-20t20 20z" fill="${C.sea}"/>`,
+  chapel: `<path d="M32 4v10M27 9h10" stroke-width="3"/><path d="M14 30L32 14l18 16v26H14z" fill="${C.parch}"/><path d="M27 56V44a5 5 0 0 1 10 0v12z" fill="${C.wood}"/><circle cx="32" cy="30" r="4" fill="${C.sky}"/>`,
+  arches: `<path d="M4 18h56v8H4z" fill="${C.parch2}"/><path d="M8 26h12v32H8zM26 26h12v32H26zM44 26h12v32H44z" fill="${C.parch}"/><path d="M20 58V40a3 3 0 0 1 6 0v18M38 58V40a3 3 0 0 1 6 0v18" fill="${C.sky}"/><path d="M4 22h56" stroke="${C.sea}" stroke-width="3"/>`,
   dice: `<rect x="10" y="10" width="44" height="44" rx="9" fill="${C.cream}"/><circle cx="22" cy="22" r="4" fill="${C.terra}" stroke="none"/><circle cx="42" cy="22" r="4" fill="${C.terra}" stroke="none"/><circle cx="32" cy="32" r="4" fill="${C.terra}" stroke="none"/><circle cx="22" cy="42" r="4" fill="${C.terra}" stroke="none"/><circle cx="42" cy="42" r="4" fill="${C.terra}" stroke="none"/>`,
 };
 export const ICON_NAMES = Object.keys(I);
@@ -87,8 +93,11 @@ export const PLACE_ICON = {
   'vieil-antibes': 'castle', 'fort-carre': 'fort', 'port-vauban': 'anchor', exflora: 'flower', pinede: 'pinecone', garoupe: 'lighthouse',
   marche: 'tomato', remparts: 'wall', picasso: 'palette', archeo: 'amphora', eilenroc: 'flower', 'juan-plage': 'shell',
   thuret: 'palm', brague: 'tree', salis: 'wave', peynet: 'pencil', autour: 'compass',
-  jazz: 'note', gravette: 'bucket', 'bastion-jaume': 'flag', bernardin: 'bell', 'bois-garoupe': 'pine', hartung: 'brush',
+  jazz: 'note', gravette: 'bucket', 'bastion-jaume': 'flag', bernardin: 'chapel', 'bois-garoupe': 'pine', hartung: 'brush',
   posidonia: 'fish', 'street-art': 'spray', tirepoil: 'footprints', calvaire: 'boot', vaugrenier: 'duck',
+  'place-nationale': 'note', cathedrale: 'bell', martyrs: 'flame', 'de-gaulle': 'flag', albert1: 'tree', ponteil: 'sun', ondes: 'umbrella',
+  ilette: 'spyglass', gallice: 'boat', 'palais-congres': 'star', 'saint-jean': 'chapel', school: 'spray', cerutti: 'trophy', semboules: 'crown',
+  estagnol: 'leaf', combes: 'dice', fontonne: 'heart', bouillides: 'arches',
 };
 export const TYPE_ICON = { treasure: 'chest', detective: 'magnifier', nature: 'leaf', photo: 'camera', challenge: 'bolt', imaginary: 'crown', surprise: 'dice' };
 export const KIND_ICON = { observe: 'binoculars', photo: 'camera', quiz: 'puzzle', count: 'tally', challenge: 'bolt', imagine: 'thought', final: 'lock' };
@@ -104,7 +113,7 @@ export const COLLECTION_COLOR = { quartiers: C.sea, nature: C.leaf, histoire: C.
 export const badgeIcon = id => BADGE_ICON[id] || PLACE_ICON[id.replace(/^q-/, '')] || 'star';
 
 // ---------- Médaille de badge ----------
-export function medal(badgeId, collection, cls = '', size) {
+function medalSvg(badgeId, collection, cls = '', size) {
   const col = COLLECTION_COLOR[collection] || C.sea;
   const wh = size ? `width="${size}" height="${size * 1.1}"` : '';
   return `<svg class="medal ${cls}" viewBox="0 0 100 110" ${wh} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -154,7 +163,7 @@ const ACCESSORY = { detective: 'magnifier', reporter: 'camera', coach: 'medal', 
 export const MOODS = Object.keys(EYES);
 export const HAT_NAMES = Object.keys(HATS);
 
-export function mascot({ hat = 'explorer', mood = 'happy', accessory = true, cls = '', size } = {}) {
+function mascotSvg({ hat = 'explorer', mood = 'happy', accessory = true, cls = '', size } = {}) {
   const wh = size ? `width="${size}" height="${size}"` : '';
   const acc = accessory && ACCESSORY[hat] ? nested(ACCESSORY[hat], 126, 132, 62) : '';
   const eyes = hat === 'agent' ? `<path d="M66 92h28q0 16-14 16t-14-16zM106 92h28q0 16-14 16t-14-16z" fill="${C.ink}"/><path d="M94 95h12"/>` : EYES[mood] || EYES.happy;
@@ -183,35 +192,52 @@ const TYPE_HAT = { treasure: 'pirate', detective: 'detective', nature: 'botanist
 const THEME_HAT = { pirate: 'pirate', archeo: 'explorer', chevalier: 'knight', agent: 'agent', temps: 'time', magicien: 'wizard', astronaute: 'astronaut' };
 export const ROLE_HAT = { detective: 'detective', photographe: 'reporter', cryptographe: 'time', navigateur: 'explorer', gardien: 'knight' };
 export const guideHat = adv => (adv.theme && THEME_HAT[adv.theme]) || TYPE_HAT[adv.type] || 'explorer';
-export const guideArt = (adv, mood = 'happy', opts = {}) => mascot({ hat: guideHat(adv), mood, ...opts });
+
 
 // ---------- Carte au trésor illustrée d'Antibes ----------
 export const MAP_POS = {
-  vaugrenier: [150, 58], brague: [214, 58], hartung: [110, 130], 'fort-carre': [236, 110], 'bastion-jaume': [272, 138], 'port-vauban': [232, 150],
-  gravette: [262, 176], marche: [196, 190], 'vieil-antibes': [234, 200], picasso: [290, 206], 'street-art': [158, 214], bernardin: [212, 236],
-  peynet: [176, 256], remparts: [276, 242], archeo: [256, 276], salis: [240, 310], calvaire: [276, 330], 'bois-garoupe': [222, 346],
-  garoupe: [288, 370], thuret: [246, 380], tirepoil: [296, 416], posidonia: [214, 420], eilenroc: [254, 448],
-  'juan-plage': [160, 366], jazz: [150, 324], pinede: [112, 340], exflora: [60, 360],
+  // Quartiers nord et ouest
+  bouillides: [30, 34], semboules: [36, 96], school: [74, 58], combes: [110, 40], cerutti: [104, 84], 'saint-jean': [66, 140], estagnol: [104, 124],
+  vaugrenier: [150, 58], brague: [214, 58], fontonne: [196, 92],
+  // Port et vieille ville
+  'fort-carre': [236, 110], 'bastion-jaume': [272, 138], 'port-vauban': [232, 150], gravette: [256, 168], cathedrale: [270, 190],
+  marche: [196, 190], 'vieil-antibes': [234, 200], picasso: [290, 206], 'de-gaulle': [150, 182], 'street-art': [158, 214], martyrs: [182, 228],
+  bernardin: [212, 236], peynet: [176, 256], 'place-nationale': [206, 262], remparts: [276, 242], archeo: [252, 268],
+  albert1: [232, 292], ponteil: [264, 298], salis: [256, 326],
+  // Cap d'Antibes
+  calvaire: [282, 334], 'bois-garoupe': [222, 346], garoupe: [288, 370], thuret: [246, 380], ondes: [212, 394], tirepoil: [296, 416],
+  posidonia: [214, 420], eilenroc: [254, 448], ilette: [232, 470],
+  // Juan-les-Pins
+  'juan-plage': [160, 366], jazz: [150, 324], 'palais-congres': [180, 330], pinede: [112, 340], exflora: [60, 360], gallice: [192, 372],
 };
-const ROUTE = ['vaugrenier', 'brague', 'fort-carre', 'bastion-jaume', 'port-vauban', 'gravette', 'vieil-antibes', 'marche', 'street-art', 'peynet', 'bernardin', 'picasso', 'remparts', 'archeo', 'salis', 'calvaire', 'bois-garoupe', 'garoupe', 'thuret', 'tirepoil', 'eilenroc', 'posidonia', 'juan-plage', 'jazz', 'pinede', 'exflora'];
+const ROUTE = ['bouillides', 'semboules', 'school', 'combes', 'cerutti', 'estagnol', 'saint-jean', 'de-gaulle', 'street-art', 'martyrs', 'peynet', 'place-nationale',
+  'bernardin', 'marche', 'vieil-antibes', 'cathedrale', 'picasso', 'remparts', 'archeo', 'albert1', 'ponteil', 'salis', 'calvaire', 'bois-garoupe', 'garoupe', 'thuret',
+  'tirepoil', 'eilenroc', 'ilette', 'posidonia', 'ondes', 'gallice', 'juan-plage', 'palais-congres', 'jazz', 'pinede', 'exflora'];
+export const MAP_ZONES = {
+  tout: { label: 'Toute la ville', box: '0 0 360 540' },
+  centre: { label: 'Vieille ville', box: '134 92 176 250' },
+  cap: { label: 'Cap d\'Antibes', box: '186 300 140 200' },
+  juan: { label: 'Juan-les-Pins', box: '24 290 200 120' },
+  nord: { label: 'Quartiers', box: '6 14 254 156' },
+};
 
-export function treasureMap(places, explored) {
+export function treasureMap(places, explored, zone = 'tout') {
   const coast = 'M0 0H252Q256 30 258 46Q268 80 262 120Q258 140 250 152L266 170Q290 186 292 214Q298 240 290 262Q268 276 266 296Q284 312 300 330Q312 372 302 404Q290 446 272 480Q246 488 230 456Q214 430 216 400Q200 376 176 372Q140 366 112 370Q80 378 56 384Q30 388 0 386Z';
   const route = ROUTE.filter(id => MAP_POS[id]).map((id, i) => `${i ? 'L' : 'M'}${MAP_POS[id][0]} ${MAP_POS[id][1]}`).join('');
   const waves = [[320, 60], [300, 150], [336, 230], [326, 300], [340, 420], [180, 430], [110, 410], [60, 440], [200, 500], [330, 500]]
     .map(([x, y]) => `<path d="M${x - 10} ${y}q5-5 10 0t10 0" stroke="${C.sea}" stroke-width="2.5"/>`).join('');
-  const trees = [[40, 60], [70, 100], [40, 200], [92, 236], [30, 300], [118, 282], [80, 176]]
+  const trees = [[140, 150], [40, 200], [92, 236], [30, 300], [118, 282], [62, 186], [170, 24]]
     .map(([x, y]) => nested('tree', x - 14, y - 14, 28)).join('');
   const pins = places.map(p => {
     const pos = MAP_POS[p.id]; if (!pos) return '';
     const done = explored.has(p.id);
     return `<g class="map-node" data-act="map-pin" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.name}${done ? ', exploré' : ', à découvrir'}">
-      <circle class="pin-bg" cx="${pos[0]}" cy="${pos[1]}" r="16" fill="${done ? C.sun : C.cream}" stroke="${C.ink}" stroke-width="3" ${done ? '' : 'stroke-dasharray="5 4"'}/>
-      ${nested(PLACE_ICON[p.id] || 'star', pos[0] - 11, pos[1] - 11, 22)}
-      ${done ? `<circle cx="${pos[0] + 12}" cy="${pos[1] - 12}" r="6.5" fill="${C.leaf}" stroke="${C.ink}" stroke-width="2"/><path d="M${pos[0] + 9} ${pos[1] - 12}l2.2 2.2 3.6-4.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : ''}
+      <circle class="pin-bg" cx="${pos[0]}" cy="${pos[1]}" r="12.5" fill="${done ? C.sun : C.cream}" stroke="${C.ink}" stroke-width="3" ${done ? '' : 'stroke-dasharray="5 4"'}/>
+      ${nested(PLACE_ICON[p.id] || 'star', pos[0] - 8.5, pos[1] - 8.5, 17)}
+      ${done ? `<circle cx="${pos[0] + 10}" cy="${pos[1] - 10}" r="5" fill="${C.leaf}" stroke="${C.ink}" stroke-width="2"/><path d="M${pos[0] + 7.6} ${pos[1] - 10}l1.7 1.7 2.8-3.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>` : ''}
     </g>`;
   }).join('');
-  return `<svg class="tmap" viewBox="0 0 360 540" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Carte au trésor d'Antibes et Juan-les-Pins">
+  return `<svg class="tmap zone-${zone}" viewBox="${(MAP_ZONES[zone] || MAP_ZONES.tout).box}" xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Carte au trésor d'Antibes et Juan-les-Pins">
     <rect width="360" height="540" fill="${C.sky}"/>
     <g class="tmap-waves">${g(waves)}</g>
     <path d="${coast}" fill="${C.parch}" stroke="${C.ink}" stroke-width="3.5" stroke-linejoin="round"/>
@@ -241,4 +267,95 @@ export function chest() {
     <rect x="90" y="96" width="20" height="26" rx="4" fill="${C.sun}"/>
     <g class="chest-lid"><path d="M40 92V74q0-26 60-26t60 26v18z" fill="${C.wood2}"/><rect x="40" y="84" width="120" height="10" fill="${C.sun}"/><path d="M62 54v38M138 54v38" stroke-width="3"/></g>
   `, 4)}</svg>`;
+}
+
+// =====================================================================
+// Personnages illustrés : Pistou et le Capitaine Barbe-Sel (images fournies)
+// =====================================================================
+const PISTOU_FILE = { happy: 'heureux', surprised: 'surpris', thinking: 'interrogatif', worried: 'inquiet', proud: 'fier', wink: 'amuse', laugh: 'amuse',
+  walk: 'marche', loupe: 'observation-loupe', hint: 'observation-loupe', photo: 'photographie', cheer: 'celebration', story: 'heureux' };
+const CAPTAIN_FILE = { happy: 'souriant', surprised: 'surpris', thinking: 'donneur-indice', hint: 'donneur-indice', loupe: 'donneur-indice', wink: 'complice',
+  proud: 'complice', laugh: 'souriant', story: 'conteur', walk: 'aventurier', cheer: 'aventurier', worried: 'surpris', photo: 'souriant' };
+export const PISTOU_POSES = Object.keys(PISTOU_FILE);
+export const CHARACTER_GALLERY = [
+  ...['heureux', 'surpris', 'interrogatif', 'inquiet', 'fier', 'amuse', 'marche', 'observation-loupe', 'photographie', 'celebration'].map(f => ({ src: `img/pistou/pistou-${f}.png`, label: f.replace('-', ' ') })),
+  ...['souriant', 'surpris', 'complice', 'conteur', 'donneur-indice', 'aventurier'].map(f => ({ src: `img/pistou/capitaine-${f}.png`, label: 'capitaine ' + f.replace('-', ' ') })),
+];
+export const characterSrc = (who, mood = 'happy') => who === 'captain'
+  ? `img/pistou/capitaine-${CAPTAIN_FILE[mood] || 'souriant'}.png`
+  : `img/pistou/pistou-${PISTOU_FILE[mood] || 'heureux'}.png`;
+export function character(who, mood = 'happy', cls = '') {
+  const name = who === 'captain' ? 'Capitaine Barbe-Sel' : 'Pistou';
+  return `<img class="char ${cls}" src="${characterSrc(who, mood)}" alt="${name}" draggable="false">`;
+}
+// Pose de Pistou selon le rôle (anciens « chapeaux »)
+const HAT_POSE = { detective: 'loupe', reporter: 'photo', time: 'thinking', knight: 'proud', explorer: 'happy', botanist: 'loupe', coach: 'cheer' };
+export function mascot({ hat = 'explorer', mood = 'happy', cls = '' } = {}) {
+  if (hat === 'pirate') return character('captain', mood, cls);
+  const pose = mood === 'happy' && HAT_POSE[hat] ? HAT_POSE[hat] : mood;
+  return character('pistou', pose, cls);
+}
+export const guideWho = adv => (adv.type === 'treasure' || adv.theme === 'pirate') ? 'captain' : 'pistou';
+export const guideArt = (adv, mood = 'happy', opts = {}) => character(guideWho(adv), mood, opts.cls || '');
+
+// =====================================================================
+// Badges : planche illustrée fournie + gabarit « même style » pour les autres
+// =====================================================================
+const BADGE_IMG = {
+  'q-fort-carre': 'fort-carre', 'q-bastion-jaume': 'nomade', 'q-vieil-antibes': 'vieil-antibes', 'q-picasso': 'picasso', 'q-port-vauban': 'port-vauban',
+  'q-garoupe': 'cap-antibes', 'q-juan-plage': 'juan-les-pins', 'q-exflora': 'exflora', 'q-tirepoil': 'sentier-littoral', 'q-salis': 'plages',
+  'q-thuret': 'thuret', 'q-archeo': 'antibes-antique', 'q-street-art': 'street-art', 'q-marche': 'marche', 'q-bernardin': 'bernardin',
+  'q-pinede': 'pinede', 'q-remparts': 'remparts', 'q-bouillides': 'aqueduc-bouillide',
+  'e-1': 'pistou', 'n-1': 'parcours-nature', 'n-mer': 'nature-littoral', 'e-lieux': 'grand-explorateur', 'h-detective': 'antibes-insolite', 'h-antipolis': 'antibes-antique',
+};
+export const badgeImage = id => BADGE_IMG[id] ? `img/badges/${BADGE_IMG[id]}.png` : null;
+const COLL_SKY = { quartiers: ['#5FB6F0', '#CDEBFB'], nature: ['#5FC07A', '#D8F2D2'], histoire: ['#E8B26A', '#FBE8C8'], saisons: ['#F08A5D', '#FDE1C8'],
+  explorateurs: ['#F5C23C', '#FFF1C2'], exceptionnels: ['#A77BD8', '#EADCF8'] };
+const escX = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+
+function styledBadge(badgeId, collection, cls = '', size) {
+  const b = ALL_BADGES.find(x => x.id === badgeId);
+  const placeId = badgeId.startsWith('q-') ? badgeId.slice(2) : null;
+  const place = placeId ? PLACES.find(p => p.id === placeId) : null;
+  const photo = placeId ? placePhoto(placeId) : null;
+  const title = place ? place.name.replace(/ – .*$/, '').replace(/ & .*$/, '').replace(/^Le street art.*/, 'Street art') : (b?.name || 'Badge');
+  const [c1, c2] = COLL_SKY[collection] || COLL_SKY.quartiers;
+  const uid = 'bd-' + badgeId.replace(/[^a-z0-9-]/gi, '');
+  const ico = badgeIcon(badgeId);
+  // Titre sur une ou deux lignes
+  let lines = [title];
+  if (title.length > 13) { const words = title.split(' '); let best = 1, diff = 99; for (let i = 1; i < words.length; i++) { const d = Math.abs(words.slice(0, i).join(' ').length - words.slice(i).join(' ').length); if (d < diff) { diff = d; best = i; } } lines = [words.slice(0, best).join(' '), words.slice(best).join(' ')]; }
+  const longest = Math.max(...lines.map(l => l.length));
+  const fs = lines.length === 1 ? (longest <= 9 ? 24 : 20) : (longest <= 11 ? 18 : longest <= 14 ? 15.5 : 13);
+  const wh = size ? `width="${size}" height="${Math.round(size * 1.1)}"` : '';
+  const clip = 'M30 74 Q30 26 100 24 Q170 26 170 74 V140 Q170 166 100 186 Q30 166 30 140 Z';
+  const scene = photo
+    ? `<image href="${photo.src}" x="30" y="22" width="140" height="150" preserveAspectRatio="xMidYMid slice" clip-path="url(#${uid}-c)"/>`
+    : `<g clip-path="url(#${uid}-c)"><rect x="30" y="22" width="140" height="150" fill="url(#${uid}-s)"/><circle cx="142" cy="52" r="15" fill="#FFE27A"/>
+        <path d="M30 118 Q70 96 108 112 T170 104 V172 H30 Z" fill="${c1}" opacity=".6"/>${nested(ico, 64, 48, 72)}</g>`;
+  const leaves = side => [0, 1, 2, 3].map(i => { const y = 196 - i * 15, x = side < 0 ? 46 - i * 6 : 154 + i * 6, r = side < 0 ? 40 + i * 12 : -40 - i * 12;
+    return `<ellipse cx="${x}" cy="${y}" rx="10" ry="4.6" transform="rotate(${r} ${x} ${y})"/>`; }).join('');
+  const ty = lines.length === 1 ? 155 : 145;
+  return `<svg class="medal styled ${cls}" viewBox="0 0 200 220" ${wh} xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${escX(b?.name || title)}">
+  <defs>
+    <linearGradient id="${uid}-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0A8"/><stop offset=".45" stop-color="#EDBE4C"/><stop offset="1" stop-color="#B57E22"/></linearGradient>
+    <linearGradient id="${uid}-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>
+    <linearGradient id="${uid}-r" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF8E1"/><stop offset="1" stop-color="#F4DC9E"/></linearGradient>
+    <clipPath id="${uid}-c"><path d="${clip}"/></clipPath>
+  </defs>
+  <path d="M16 72 Q16 10 100 8 Q184 10 184 72 V140 Q184 178 100 208 Q16 178 16 140 Z" fill="url(#${uid}-g)" stroke="#6E4510" stroke-width="5" stroke-linejoin="round"/>
+  ${scene}
+  <path d="${clip}" fill="none" stroke="#FFF6CF" stroke-width="3.5"/>
+  <g fill="#7DB84F" stroke="#2E5A1B" stroke-width="1.6">${leaves(-1)}${leaves(1)}</g>
+  <path d="M2 124 Q100 112 198 124 L187 150 L198 176 Q100 164 2 176 L13 150 Z" fill="url(#${uid}-r)" stroke="#9C6A1C" stroke-width="3.5" stroke-linejoin="round"/>
+  ${lines.map((l, i) => `<text x="100" y="${ty + i * (fs + 1)}" text-anchor="middle" font-family="'Baloo 2', Nunito, sans-serif" font-weight="800" font-size="${fs}" fill="#12305A">${escX(l)}</text>`).join('')}
+  <circle cx="100" cy="197" r="18" fill="#12305A" stroke="#EDBE4C" stroke-width="3.5"/>
+  ${nested(ico, 88, 185, 24)}
+</svg>`;
+}
+
+export function medal(badgeId, collection, cls = '', size) {
+  const img = badgeImage(badgeId);
+  if (img) return `<img class="medal badge-img ${cls}" src="${img}" alt="" draggable="false" ${size ? `width="${size}"` : ''}>`;
+  return styledBadge(badgeId, collection, cls, size);
 }

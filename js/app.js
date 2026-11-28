@@ -3,8 +3,8 @@ import { PLACES, TYPES, ROLES, COLLECTIONS, ALL_BADGES, LEVELS, AVATARS, WEATHER
 import { generate, suggest, nearestPlace, warningsFor, levelFor, computeLevels, rng } from './generator.js';
 import { state, save, uid, putPhoto, deletePhoto, photoURL, resizeImage, requestPersistence, exportBackup, importBackup, replaceState } from './store.js';
 import { renderSouvenir } from './souvenir.js';
-import { chest, icon, mascot, medal, guideArt, treasureMap, PLACE_ICON, TYPE_ICON, KIND_ICON, ROLE_HAT, ICON_NAMES, MOODS, HAT_NAMES, COLLECTION_COLOR } from './art.js';
-import { PHOTOS, placePhoto, stepPhoto, photoURLs } from './photos.js';
+import { chest, icon, mascot, medal, guideArt, guideWho, character, CHARACTER_GALLERY, treasureMap, MAP_ZONES, PLACE_ICON, TYPE_ICON, KIND_ICON, ROLE_HAT, ICON_NAMES, MOODS, HAT_NAMES, COLLECTION_COLOR } from './art.js';
+import { PHOTOS, placePhoto, stepPhoto, photoURLs, stepDetail, DEFAULT_HINTS } from './photos.js';
 import { SOUNDS, play, setSoundEnabled, soundEnabled, preloadSounds, soundURLs } from './sounds.js';
 
 const $ = (s, el = document) => el.querySelector(s);
@@ -72,7 +72,7 @@ const levelInfo = stars => {
 const weatherKind = () => state.weather?.kind || 'sun';
 
 // ---------- Visuels ----------
-const face = (adv, mood = 'happy') => `<div class="face art">${guideArt(adv, mood, { accessory: false })}</div>`;
+const face = (adv, mood = 'happy') => `<div class="face art">${guideArt(adv, mood)}</div>`;
 const credit = p => `<span class="credit">${esc(p.author)} · <a href="${p.page}" target="_blank" rel="noopener">${esc(p.license)}</a> · Wikimedia Commons</span>`;
 const photoFig = (p, caption = '') => p ? `<figure class="photo-ref"><img src="${p.src}" alt="${esc(p.title)}" loading="lazy" onerror="this.closest('figure').classList.add('broken')">
   <figcaption>${caption ? `<b>${caption}</b>` : ''}<span>${esc(p.title)}</span>${credit(p)}</figcaption></figure>` : '';
@@ -113,14 +113,14 @@ function render() {
   const r = route();
   if (!state.family.members.length && r.path !== 'bienvenue') { location.replace('#/bienvenue'); return; }
   clearInterval(ui.timer?.id); ui.timer = null;
-  const screens = { accueil: home, explorer, aventure: adventure, collection, famille: family, creer: wizard, apercu: previewScreen, album: albumDetail, bienvenue: onboarding, kit: kitScreen, credits: creditsScreen };
+  const screens = { accueil: home, explorer, aventure: adventure, collection, famille: family, creer: wizard, apercu: previewScreen, album: albumDetail, bienvenue: onboarding, kit: kitScreen, credits: creditsScreen, aventures: adventuresScreen };
   const fn = screens[r.path] || home;
   const tabbarHidden = ['bienvenue'].includes(r.path);
   document.getElementById('tabbar').hidden = tabbarHidden;
   view.classList.toggle('no-tabs', tabbarHidden);
   view.innerHTML = fn(r);
   if (ui.lastPath !== r.path + (r.arg || '')) { ui.lastPath = r.path + (r.arg || ''); view.classList.remove('anim'); void view.offsetWidth; view.classList.add('anim'); clearTimeout(ui.animT); ui.animT = setTimeout(() => view.classList.remove('anim'), 900); }
-  const tab = { creer: 'accueil', apercu: 'accueil', album: 'collection', kit: 'famille', credits: 'famille' }[r.path] || r.path;
+  const tab = { creer: 'accueil', apercu: 'accueil', album: 'collection', kit: 'famille', credits: 'famille', aventures: 'aventure' }[r.path] || r.path;
   document.querySelectorAll('.tabbar a').forEach(a => {
     a.toggleAttribute('aria-current', a.dataset.tab === tab); if (a.dataset.tab === tab) a.setAttribute('aria-current', 'page');
     a.classList.toggle('live', a.dataset.tab === 'aventure' && !!currentAdv());
@@ -134,13 +134,10 @@ window.addEventListener('hashchange', () => { window.scrollTo(0, 0); render(); }
 let onboardMembers = [];
 function onboarding() {
   return `
-  <div class="hero hero-mascot">
-    <div class="stack">
-      <span class="pill" style="align-self:flex-start;color:var(--ink)">Antibes · Juan-les-Pins</span>
-      <h1>Family Explorer</h1>
-      <p style="font-size:19px">Salut, moi c'est <b>Pistou</b> ! Avec moi, chaque sortie devient une aventure.</p>
-    </div>
-    ${mascot({ hat: 'explorer', mood: 'cheer', cls: 'hero-art' })}
+  <div class="splash">
+    ${logo()}
+    <div class="splash-pistou">${character('pistou', 'happy', 'splash-char')}</div>
+    <div class="speech big"><b>Salut ! Je suis Pistou !</b><span>Prêt·e à explorer Antibes et Juan-les-Pins avec moi ?</span></div>
   </div>
   <div class="principles">
     <div class="card">${icon('binoculars', 'ico-lg')}<b>Découvrir</b></div>
@@ -169,37 +166,35 @@ function home() {
   const T = TYPES[sug.type];
   return `
   ${navigator.onLine ? '' : '<div class="offline-flag" style="border-radius:12px">📴 Hors connexion : les aventures fonctionnent, la carte et la météo attendront.</div>'}
-  <div class="hello">
-    <div class="avatar-stack">${members.slice(0, 4).map(m => `<span>${m.avatar}</span>`).join('')}</div>
-    <div style="flex:1"><p class="muted small">Bonjour,</p><h1 style="font-size:24px">${esc(state.family.name || 'les explorateurs')} !</h1></div>
-    <button class="chip" data-act="weather-pick" aria-label="Météo : ${WEATHER[wk].name}. Modifier">${WEATHER[wk].emoji} ${w?.temp != null && !w.manual ? w.temp + '°' : WEATHER[wk].name}</button>
+  <div class="greet">
+    <span class="greet-av">${members[0]?.avatar || '🦊'}</span>
+    <h2>Bonjour ${esc(members.length === 1 ? members[0].name : (state.family.name || 'les explorateurs'))} !</h2>
+    <button class="chip weather" data-act="weather-pick" aria-label="Météo : ${WEATHER[wk].name}. Modifier">${WEATHER[wk].emoji} ${w?.temp != null && !w.manual ? w.temp + '°' : WEATHER[wk].name}</button>
+    <a class="icon-btn gear" href="#/famille" aria-label="Réglages de la famille">⚙️</a>
   </div>
 
   ${cur ? `
   <div class="card sun stack">
-    <div class="row" style="align-items:center"><div style="font-size:40px">${cur.guide.emoji}</div>
+    <div class="row" style="align-items:center"><div class="cur-char">${guideArt(cur, 'walk')}</div>
       <div style="flex:1"><p class="small muted">Aventure en cours</p><h3>${esc(cur.title)}</h3><p class="small">Mission ${Math.min(cur.pos + 1, cur.steps.length)} sur ${cur.steps.length}</p></div></div>
     <a class="btn sea block" href="#/aventure">Reprendre l'aventure ▶️</a>
   </div>` : ''}
 
-  <div class="hero stack">
-    <div class="hero-mascot">
-      <div class="stack"><h2 style="font-size:27px">Prêts pour une nouvelle aventure ?</h2>
-      <p>Chaque sortie est une mission, chaque lieu cache une histoire.</p></div>
-      ${mascot({ hat: 'explorer', mood: 'happy', cls: 'hero-art' })}
-    </div>
-    <a class="btn big block" href="#/creer">${icon('map', 'ico-btn')} Créer une aventure</a>
-    <button class="btn block" style="background:#fff;box-shadow:0 4px 0 #CFE0E6" data-act="surprise">${icon('dice', 'ico-btn')} Mission surprise</button>
+  <div class="home-hero">
+    <div class="speech">Prêt pour une nouvelle aventure ?</div>
+    ${character('pistou', 'happy', 'home-char')}
+  </div>
+  <div class="tiles3">
+    <a class="tile" href="#/explorer">${icon('spyglass')}<b>Découvrir</b><small>les lieux</small></a>
+    <a class="tile" href="#/aventures">${icon('puzzle')}<b>Jouer</b><small>des missions</small></a>
+    <a class="tile" href="#/collection">${icon('trophy')}<b>Collectionner</b><small>des badges</small></a>
   </div>
 
-  <div class="section-title"><h3>Suggestion du jour</h3><span class="pill">${WEATHER[wk].emoji} ${WEATHER[wk].name}</span></div>
-  <a class="card suggest" href="#/creer?place=${sug.place.id}&type=${sug.type}">
-    ${placePhoto(sug.place.id) ? `<div class="suggest-photo" style="background-image:url('${placePhoto(sug.place.id).src}')"><span class="suggest-ico">${placeIcon(sug.place.id)}</span></div>` : `<div class="suggest-photo plain"><span class="suggest-ico">${placeIcon(sug.place.id)}</span></div>`}
-    <div class="row" style="align-items:center;padding:14px 16px">
-      <div style="flex:1"><h3>${esc(sug.place.name)}</h3><p class="small muted">${T.name}${sug.fresh ? ' · <b style="color:var(--terra)">Nouveau lieu !</b>' : ''}</p></div>
-      ${icon(TYPE_ICON[sug.type], 'ico-md')}
-    </div>
-  </a>
+  ${dayCard(sug)}
+  <div class="row">
+    <a class="btn" href="#/creer">${icon('map', 'ico-btn')} Créer</a>
+    <button class="btn ghost" data-act="surprise">${icon('dice', 'ico-btn')} Surprise</button>
+  </div>
 
   <div class="card level-card">
     <div class="em">${lv.cur.emoji}</div>
@@ -230,7 +225,8 @@ function explorer() {
     <button role="tab" aria-selected="${real}" data-act="map-mode" data-m="reelle">${icon('compass', 'ico-tab')} Carte réelle</button>
   </div>
   ${real ? `<div id="map" role="region" aria-label="Carte des lieux d'Antibes"><div class="empty"><div class="em">🗺️</div><p class="muted">Chargement de la carte…</p></div></div>`
-    : `<div class="tmap-wrap">${treasureMap(PLACES, ex)}</div><p class="small muted center">Touchez un lieu pour partir à l'aventure.</p>`}
+    : `<div class="chip-row zones">${Object.entries(MAP_ZONES).map(([k, z]) => `<button class="chip" data-act="map-zone" data-z="${k}" aria-pressed="${(ui.mapZone || 'tout') === k}">${z.label}</button>`).join('')}</div>
+    <div class="tmap-wrap">${treasureMap(PLACES, ex, ui.mapZone || 'tout')}</div><p class="small muted center">Touchez un lieu pour partir à l'aventure. Choisissez un quartier pour zoomer.</p>`}
   <div class="legend"><span><i class="dot done"></i> Exploré (${ex.size})</span><span><i class="dot"></i> À découvrir (${PLACES.length - ex.size})</span></div>
   <div class="stack">
     ${PLACES.map(p => `
@@ -265,6 +261,7 @@ after.explorer = async () => {
       L.marker([p.lat, p.lng], { icon: pin, title: p.name }).addTo(map)
         .bindPopup(`<b>${esc(p.name)}</b><br>${ex.has(p.id) ? '✅ Déjà exploré' : '✨ À découvrir'}<br><a class="btn sea" href="#/creer?place=${p.id}">Créer une aventure</a>`);
     }
+    map.fitBounds(L.latLngBounds(PLACES.map(p => [p.lat, p.lng])), { padding: [18, 18] });
     if (navigator.geolocation && localStorage.getItem('fe-geo') === '1') {
       navigator.geolocation.getCurrentPosition(pos => L.circleMarker([pos.coords.latitude, pos.coords.longitude], { radius: 9, color: '#0E6E8C', fillOpacity: .8 }).addTo(map), () => {});
     }
@@ -289,11 +286,12 @@ function ensureDraft(q = {}) {
   if (!draft.memberIds.length) draft.memberIds = state.family.members.map(m => m.id);
 }
 const AREAS = [
-  ['Vieil Antibes et le port', p => p.area === 'Antibes' && !p.tags.includes('nature') && !p.indoor],
+  ['Vieille ville et port', p => p.area === 'Antibes' && p.lat < 43.5925 && p.lng > 7.115 && !p.indoor && !p.tags.includes('nature')],
   ['Musées et lieux abrités', p => p.indoor],
   ['Cap d\'Antibes', p => p.area === 'Cap d\'Antibes' && !p.indoor],
   ['Juan-les-Pins', p => p.area === 'Juan-les-Pins' && !p.indoor],
-  ['Parcs et nature', p => (p.area === 'Antibes' && p.tags.includes('nature') && !p.indoor) || p.area === 'Villeneuve-Loubet'],
+  ['Parcs, jardins et nature', p => !p.indoor && (p.tags.includes('nature') || ['Villeneuve-Loubet', 'Valbonne'].includes(p.area)) && !(p.area === 'Cap d\'Antibes' || p.area === 'Juan-les-Pins')],
+  ['Quartiers d\'Antibes', p => p.area === 'Antibes' && !p.indoor && !p.tags.includes('nature') && !(p.lat < 43.5925 && p.lng > 7.115)],
 ];
 function wizard(r) {
   ensureDraft(r.q);
@@ -410,6 +408,57 @@ function placeHero(a, label, secret = false) {
   </div>`;
 }
 
+// ---------- Logo, aventure du jour, aventures prêtes à jouer ----------
+function logo() {
+  return `<div class="logo" role="img" aria-label="Family Explorer, les sorties deviennent des aventures">
+    <span class="logo-title">Family<br>Explorer</span><span class="logo-compass">${icon('compass')}</span>
+    <span class="logo-ribbon">Les sorties deviennent des aventures</span></div>`;
+}
+const CAT_NATURE = ['nature', 'jardin', 'forêt', 'oiseaux', 'rivière', 'randonnée', 'mer'];
+const CAT_CULTURE = ['histoire', 'art', 'culture', 'musique', 'quartier', 'goût'];
+function readyList() {
+  if (ui.ready) return ui.ready;
+  const members = state.family.members;
+  ui.ready = PLACES.map((p, i) => {
+    const short = p.steps.length <= 5 || p.tags.includes('petits') || p.tags.includes('jeux');
+    const duration = short ? 20 : 45;
+    const type = p.tags.includes('nature') ? 'nature' : p.tags.includes('art') ? 'detective' : p.tags.includes('mer') ? 'treasure' : (i % 2 ? 'detective' : 'treasure');
+    const seed = 1000 + i * 37;
+    const cats = [CAT_NATURE.some(t => p.tags.includes(t)) && 'nature', CAT_CULTURE.some(t => p.tags.includes(t)) && 'culture'].filter(Boolean);
+    let title = p.name;
+    try { title = generate({ placeId: p.id, members, duration, difficulty: 'auto', type, weather: 'sun', hour: 11, seed }).title; } catch { /* titre par défaut */ }
+    return { id: p.id, place: p, duration, type, seed, cats, ages: `${p.minAge || 5}-12 ans`, title };
+  });
+  return ui.ready;
+}
+function readyCard(r) {
+  const ph = placePhoto(r.id);
+  return `<button class="ready-card" data-act="ready" data-id="${r.id}">
+    <span class="ready-photo" style="${ph ? `background-image:url('${ph.src}')` : ''}">${ph ? '' : `<span class="ready-ico">${placeIcon(r.id)}</span>`}<span class="ready-type">${icon(TYPE_ICON[r.type], 'ico-pill')} ${TYPES[r.type].name}</span></span>
+    <span class="ready-body"><b>${esc(r.title)}</b><span class="ready-place">${esc(r.place.name)}</span>
+      <span class="ready-meta">⏱️ ${r.duration} min · 👤 ${r.ages}</span></span>
+    <span class="ready-go" aria-hidden="true">›</span></button>`;
+}
+function dayCard(sug) {
+  const r = readyList().find(x => x.id === sug.place.id) || readyList()[0];
+  const ph = placePhoto(r.id);
+  return `<button class="day-card" data-act="ready" data-id="${r.id}">
+    <span class="day-photo" style="${ph ? `background-image:url('${ph.src}')` : ''}">${ph ? '' : placeIcon(r.id)}<span class="day-chip">Aventure du jour</span></span>
+    <span class="day-body"><b>${esc(r.title)}</b><span>${icon('map', 'ico-pill')} ${esc(r.place.name)} · ${r.duration} min${sug.fresh ? ' · <em>Nouveau lieu !</em>' : ''}</span></span>
+    <span class="day-go" aria-hidden="true">›</span></button>`;
+}
+function adventuresScreen() {
+  const f = ui.readyFilter || 'toutes';
+  const list = readyList().filter(r => f === 'toutes' || (f === 'courtes' ? r.duration <= 20 : r.cats.includes(f)));
+  const cur = currentAdv();
+  return `
+  <div class="top"><h1>Aventures</h1></div>
+  ${cur ? `<a class="card cur-card" href="#/aventure"><div class="cur-char">${guideArt(cur, 'walk')}</div><div style="flex:1"><span class="small muted">Aventure en cours</span><b>${esc(cur.title)}</b><span class="small">Mission ${Math.min(cur.pos + 1, cur.steps.length)} sur ${cur.steps.length}</span></div><span class="ready-go">›</span></a>` : ''}
+  <div class="filters" role="tablist">${[['toutes', 'Toutes'], ['courtes', 'Courtes'], ['nature', 'Nature'], ['culture', 'Culture']].map(([id, l]) => `<button role="tab" aria-selected="${f === id}" data-act="ready-filter" data-id="${id}">${l}</button>`).join('')}</div>
+  <div class="stack">${list.map(readyCard).join('') || '<p class="muted center">Aucune aventure dans cette catégorie.</p>'}</div>
+  <a class="btn ghost block" href="#/creer">${icon('map', 'ico-btn')} Créer mon aventure sur mesure</a>`;
+}
+
 function startAdventure() {
   const cur = currentAdv();
   if (cur) cur.status = 'abandoned';
@@ -431,8 +480,8 @@ function adventure() {
   const a = currentAdv();
   if (!a) return `
     <div class="top"><h1>Aventure</h1></div>
-    <div class="card empty"><div class="em">🧭</div><h2>Aucune aventure en cours</h2><p class="muted">Créez une aventure ou laissez-vous surprendre !</p>
-      <a class="btn block" href="#/creer">✨ Créer une aventure</a><button class="btn ghost block" data-act="surprise">🎲 Mission surprise</button></div>`;
+    <div class="card empty">${character('pistou', 'thinking', 'empty-char')}<h2>Aucune aventure en cours</h2><p class="muted">Choisissez une aventure prête à jouer ou créez la vôtre !</p>
+      <a class="btn block" href="#/aventures">${icon('puzzle', 'ico-btn')} Aventures prêtes à jouer</a><a class="btn ghost block" href="#/creer">${icon('map', 'ico-btn')} Créer une aventure</a></div>`;
 
   const missions = a.steps.length;
   const step = a.steps[a.pos];
@@ -440,9 +489,10 @@ function adventure() {
   const stars = advStars(a);
   const letters = a.steps.filter(s => s.kind !== 'final');
   const head = `
-  <div class="adv-head">
+  <div class="mission-top">
     <button class="icon-btn" data-act="adv-menu" aria-label="Options de l'aventure">☰</button>
-    <div class="meta"><b>${esc(a.title)} · ${a.pos + 1}/${missions}</b><div class="progress"><i style="width:${pct}%"></i></div></div>
+    <div class="mt-mid"><b>${a.introSeen ? (step.kind === 'final' ? 'Le code secret' : `Mission ${a.pos + 1} / ${missions - 1}`) : esc(a.title)}</b>
+      <div class="segs" aria-label="Progression : ${pct} %">${a.steps.map((st, i) => `<i class="${st.done ? 'done' : i === a.pos && a.introSeen ? 'cur' : ''}"></i>`).join('')}</div></div>
     <button class="icon-btn snd" data-act="sound-toggle" aria-label="${soundEnabled() ? 'Couper le son' : 'Activer le son'}">${icon(soundEnabled() ? 'speaker' : 'mute')}</button>
     <span class="pill">⭐ ${stars}</span>
   </div>
@@ -453,7 +503,7 @@ function adventure() {
     return `${head}
     ${placeHero(a, `${TYPES[a.type].name}${a.themeName ? ' · ' + a.themeName : ''}`)}
     <div class="story parchment">
-      <div class="story-art">${guideArt(a, 'happy')}</div>
+      <div class="story-art">${guideArt(a, 'story')}</div>
       <div class="stack"><b class="story-name">${esc(a.guide.name)}</b><p>${esc(a.intro)}</p><p class="small">Chaque mission réussie vous donne une <b>lettre du code secret</b> !</p></div>
     </div>
     ${a.memberIds.length >= 2 ? `<div class="card stack"><h3>Les rôles de l'équipe</h3><p class="small muted">Ils changent à chaque mission, pour que chacun participe.</p>
@@ -496,7 +546,7 @@ function adventure() {
       ${roles}
       ${step.coop ? '<span class="pill leaf" style="align-self:flex-start">🤝 Mission d\'équipe : tout le monde participe !</span>' : ''}
       ${levelsHtml}
-      ${stepPhoto(step.id) && (step.kind !== 'quiz' || step.answer === 'ok') ? photoFig(stepPhoto(step.id), stepPhoto(step.id).caption || 'Photo de repère : compare avec ce que tu vois !') : ''}
+      ${missionVisual(a, step)}
       ${stepAction(a, step)}
     </div>
   </article>
@@ -520,7 +570,7 @@ function stepAction(a, step) {
       return `
       <h3>🧩 ${esc(q.q)}</h3>
       <div class="stack">${order.map(i => `<button class="choice ${solved && i === q.answer ? 'right' : ui.quizWrong.has(i) ? 'wrong' : ''}" data-act="quiz" data-i="${i}" ${solved ? 'disabled' : ''}>${esc(q.choices[i])}</button>`).join('')}</div>
-      ${ui.quizWrong.size && !solved ? '<p class="small muted">Presque ! Essayez encore 💪</p>' : ''}
+      ${ui.quizWrong.size && !solved ? `<div class="oops">${guideArt(a, 'worried')}<p>Presque ! Essayez encore, vous allez trouver 💪</p></div>` : ''}
       ${solved ? `<div class="explain">💡 ${esc(q.explain)}</div><button class="btn big block leaf" data-act="complete" data-stars="${ui.quizWrong.size ? 1 : 2}">Continuer ➜</button>` : ''}`;
     }
     case 'count':
@@ -540,6 +590,53 @@ function stepAction(a, step) {
   }
   return '';
 }
+// ---------- Visuel de mission : photo de référence + Pistou + zoom-indice ----------
+const KIND_TIP = {
+  observe: 'Pas de photo pour celle-là : c\'est toi l\'explorateur, ouvre grand les yeux !',
+  photo: 'À toi de prendre la photo de référence pour l\'album !',
+  count: 'Compte bien, je vérifie derrière toi !',
+  challenge: 'Prêts ? On se lance tous ensemble !',
+  imagine: 'Ferme les yeux… et laisse parler ton imagination !',
+  quiz: 'Réfléchis bien, la réponse est autour de toi !',
+};
+const HINT_MOOD = ['thinking', 'loupe', 'surprised', 'cheer'];
+const KIND_POSE = { photo: 'photo', observe: 'loupe', quiz: 'thinking', count: 'thinking', challenge: 'cheer', imagine: 'wink' };
+function missionVisual(a, step) {
+  const p = stepPhoto(step.id);
+  const d = stepDetail(step.id) || {};
+  if (!p) {
+    return `<div class="visual noimg"><div class="visual-pistou">${guideArt(a, KIND_POSE[step.kind] || 'happy')}</div>
+      <div class="visual-say"><span class="visual-ico">${icon(KIND_ICON[step.kind])}</span><p>${esc(KIND_TIP[step.kind] || KIND_TIP.observe)}</p></div></div>`;
+  }
+  if (step.kind === 'quiz' && step.answer !== 'ok') {
+    return `<div class="visual noimg"><div class="visual-pistou">${guideArt(a, 'wink')}</div>
+      <div class="visual-say"><span class="visual-ico">${icon('camera')}</span><p>La photo de repère apparaîtra quand vous aurez trouvé la bonne réponse !</p></div></div>`;
+  }
+  const max = d.focus ? 3 : 2;
+  const quizDone = step.kind === 'quiz';
+  const lvl = Math.min(max, step.hint ?? (quizDone ? 2 : 0));
+  const hints = (d.hints || []).map((h, i) => h || DEFAULT_HINTS[i]);
+  const text = hints[lvl] || DEFAULT_HINTS[lvl];
+  const [fx, fy] = d.focus || [50, 50];
+  const z = d.zoom || 2.6;
+  const label = lvl < 2 ? `Indice ${lvl + 1}` : lvl === 2 ? (p.caption ? 'À comparer' : 'Photo de repère') : 'Zoom sur le détail';
+  const next = lvl < max ? (lvl === 0 ? 'Un indice' : lvl === 1 ? 'Voir la photo' : 'Zoom sur le détail') : '';
+  return `<figure class="visual" data-lvl="${lvl}">
+    <div class="visual-photo">
+      <img src="${p.src}" alt="${lvl >= 2 ? esc(p.title) : 'Photo mystère'}" loading="lazy" onerror="this.closest('.visual').classList.add('broken')">
+      ${lvl >= 3 ? `<span class="zoom-ring" style="left:${fx}%;top:${fy}%"></span>
+        <div class="zoom-pane ${fx > 55 ? 'left' : 'right'}" style="background-image:url('${p.src}');background-size:${z * 100}% auto;background-position:${fx}% ${fy}%"><span>Zoom ×${z}</span></div>` : ''}
+      <span class="visual-step">${Array.from({ length: max + 1 }, (_, i) => `<i class="${i <= lvl ? 'on' : ''}"></i>`).join('')}</span>
+    </div>
+    <figcaption>
+      <div class="visual-row"><div class="visual-pistou mini">${guideArt(a, HINT_MOOD[lvl], { accessory: false })}</div>
+        <div class="visual-text"><b>${label}</b><span>${esc(text)}</span></div></div>
+      ${next ? `<button class="btn ghost hint-btn" data-act="hint" data-max="${max}">${icon(lvl === max - 1 && max === 3 ? 'magnifier' : 'eye', 'ico-btn')} ${next}</button>` : ''}
+      ${lvl >= 2 ? `<span class="credit">${esc(p.title)} · ${esc(p.author)} · <a href="${p.page}" target="_blank" rel="noopener">${esc(p.license)}</a>${p.note ? ' · ⚠️ ' + esc(p.note) : ''}</span>` : ''}
+    </figcaption>
+  </figure>`;
+}
+
 function rngOrder(seed, n) { const r = rng(seed); const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 
 function finalStep(a, step) {
@@ -693,7 +790,7 @@ function collection() {
     <p class="muted small center">${monthAdvs.length ? `${monthAdvs.length} aventure${monthAdvs.length > 1 ? 's' : ''} ce mois-ci` : 'Aucune aventure ce mois-ci… pour l\'instant !'}</p>`;
   }
   return `
-  <div class="top"><h1>Collection</h1></div>
+  <div class="top"><h1>Ma collection</h1></div>
   <div class="tabs" role="tablist">${tabs.map(([id, l]) => `<button role="tab" aria-selected="${ui.collTab === id}" data-act="coll-tab" data-id="${id}">${l}</button>`).join('')}</div>
   ${body}`;
 }
@@ -708,13 +805,16 @@ function albumDetail(r) {
   const photos = a.steps.flatMap(s => s.photoIds || []).concat(a.bonus?.photoIds || []);
   const notes = a.steps.filter(s => s.answer && s.answer !== 'ok');
   return `
-  <div class="top"><a class="icon-btn" href="#/collection" aria-label="Retour">←</a><h2>${reward ? 'Aventure réussie !' : 'Souvenir'}</h2></div>
+  <div class="top"><a class="icon-btn" href="#/collection" aria-label="Retour">←</a><h2>${reward ? 'Récompense' : 'Souvenir'}</h2></div>
   ${reward ? `
-  <div class="hero stack center" style="align-items:center">
+  <div class="reward-hero">
+    <h1 class="reward-title">Aventure réussie !</h1>
     <div class="reward-scene"><div class="reward-chest">${chest()}</div><div class="reward-art">${guideArt(a, 'cheer')}</div></div>
-    <h1>Bravo ${a.memberIds.map(memberById).filter(Boolean).map(m => esc(m.name)).join(', ') || 'les explorateurs'} !</h1>
-    <p>Le mot secret était <b style="color:var(--sun)">${a.steps.at(-1).word}</b>. ${esc(a.guide.name)} est très fier de vous !</p>
-    <span class="pill" style="color:var(--ink);font-size:18px">⭐ ${advStars(a)} étoiles gagnées</span>
+    <div class="ribbon">Bravo ${a.memberIds.map(memberById).filter(Boolean).map(m => esc(m.name)).join(', ') || 'les explorateurs'} !</div>
+    <p>Tu as retrouvé le mot secret :</p>
+    <div class="word-ribbon">${a.steps.at(-1).word}</div>
+    <div class="reward-stats"><span>${icon('star', 'ico-pill')} +${advStars(a)} étoiles</span><span>${icon('chest', 'ico-pill')} +${badges.length} badge${badges.length > 1 ? 's' : ''}</span></div>
+    <p class="small">${esc(a.guide.name)} est très fier de vous !</p>
   </div>` : `
   <div class="hero stack"><h1>${esc(a.title)}</h1><p>📍 ${esc(a.placeName)} · ${fmtDate(a.finishedAt)}</p><p>${nameList(a.memberIds)}</p></div>`}
 
@@ -828,7 +928,7 @@ function memberForm(m, ctx) {
     if (ctx === 'onboard') onboardMembers.push({ id: uid(), name, age, avatar });
     else if (isNew) { const nm = { id: uid(), name, age, avatar }; state.family.members.push(nm); if (draft) draft.memberIds.push(nm.id); }
     else Object.assign(memberById(m.id), { name, age, avatar });
-    save(); closeModal(); render();
+    ui.ready = null; save(); closeModal(); render();
   };
   setTimeout(() => modal.querySelector('#m-name').focus(), 50);
 }
@@ -842,11 +942,10 @@ function kitScreen() {
   return `
   <div class="top"><a class="icon-btn" href="#/famille" aria-label="Retour">←</a><h1>Bibliothèque visuelle</h1></div>
   <p class="muted">Le kit graphique Family Explorer : un seul univers « carnet d'explorateur » pour toutes les aventures.</p>
-  <section class="card stack"><h2>La mascotte : Pistou</h2>
-    <p class="small muted">Un renard explorateur, curieux et malicieux. Ses expressions :</p>
-    <div class="kit-grid">${MOODS.map(m => `<figure>${mascot({ mood: m, accessory: false })}<figcaption>${MOOD_LABEL[m]}</figcaption></figure>`).join('')}</div>
-    <p class="small muted">Ses costumes : un par guide et par rôle.</p>
-    <div class="kit-grid">${HAT_NAMES.map(h => `<figure>${mascot({ hat: h })}<figcaption>${HAT_LABEL[h]}</figcaption></figure>`).join('')}</div>
+  <section class="card stack"><h2>Pistou et le Capitaine Barbe-Sel</h2>
+    <p class="small muted">Pistou, le renard explorateur, accompagne toutes les missions. Le Capitaine Barbe-Sel, vieux loup de mer d'Antibes, guide les chasses au trésor.</p>
+    <div class="kit-grid">${CHARACTER_GALLERY.map(c => `<figure><img class="char" src="${c.src}" alt=""><figcaption>${c.label}</figcaption></figure>`).join('')}</div>
+
   </section>
   <section class="card stack"><h2>Objets, indices et récompenses</h2>
     <div class="icon-grid">${ICON_NAMES.map(n => `<figure>${icon(n)}<figcaption>${ICON_LABEL[n] || n}</figcaption></figure>`).join('')}</div>
@@ -873,7 +972,7 @@ function creditsScreen() {
   return `
   <div class="top"><a class="icon-btn" href="#/famille" aria-label="Retour">←</a><h1>Crédits</h1></div>
   <div class="card stack small">
-    <p><b>Illustrations</b> (mascotte Pistou, objets, médailles, carte au trésor) : créations originales Family Explorer.</p>
+    <p><b>Illustrations</b> : icône, Pistou, Capitaine Barbe-Sel et badges illustrés fournis par Family Explorer ; objets, pictogrammes, badges dessinés et carte au trésor : créations originales Family Explorer.</p>
     <p><b>Photographies et sons</b> : Wikimedia Commons, sous licences libres. Merci aux photographes et preneurs de son !</p>
   </div>
   <h2>Sons et jingles</h2>
@@ -918,6 +1017,14 @@ const actions = {
   'd-member': d => { const s = new Set(draft.memberIds); s.has(d.id) ? s.delete(d.id) : s.add(d.id); draft.memberIds = state.family.members.map(m => m.id).filter(id => s.has(id)); render(); },
   generate: () => doGenerate(),
   reroll: () => { preview = null; doGenerate(); },
+  hint: d => {
+    const a = currentAdv(); const st = a.steps[a.pos];
+    const base = st.kind === 'quiz' ? 2 : 0;
+    st.hint = Math.min(Number(d.max), (st.hint ?? base) + 1); save();
+    play(st.hint >= 3 ? 'magic' : 'page', { volume: 0.5 });
+    render();
+    document.querySelector('.visual')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  },
   'sound-toggle': () => { state.settings.sound = !soundEnabled(); setSoundEnabled(state.settings.sound); save(); if (state.settings.sound) play('chime'); render(); },
   start: () => startAdventure(),
   'intro-ok': () => { play('page', { volume: 0.6 }); currentAdv().introSeen = true; save(); render(); window.scrollTo(0, 0); },
@@ -973,7 +1080,14 @@ const actions = {
   },
   'coll-tab': d => { ui.collTab = d.id; if (route().path !== 'collection') go('#/collection'); else render(); },
   'sound-test': d => { const was = soundEnabled(); setSoundEnabled(true); play(d.k); setSoundEnabled(was); },
+  'ready-filter': d => { ui.readyFilter = d.id; render(); },
+  ready: d => {
+    const r = readyList().find(x => x.id === d.id); if (!r) return;
+    draft = { placeId: r.id, memberIds: state.family.members.map(m => m.id), duration: r.duration, difficulty: state.settings.difficulty || 'auto', type: r.type, weather: weatherKind() };
+    doGenerate(r.seed);
+  },
   'map-mode': d => { ui.mapMode = d.m; render(); },
+  'map-zone': d => { ui.mapZone = d.z; render(); },
   'map-pin': d => {
     const p = placeById(d.id); const ph = placePhoto(p.id); const done = explored().has(p.id);
     const modal = openModal(`${ph ? photoFig(ph) : `<div class="hero-ico" style="margin:auto">${placeIcon(p.id)}</div>`}
@@ -1073,7 +1187,7 @@ if ('serviceWorker' in navigator) {
 }
 
 {
-  const TAB_ICON = { accueil: 'backpack', explorer: 'map', aventure: 'compass', collection: 'trophy', famille: 'heart' };
+  const TAB_ICON = { accueil: 'house', explorer: 'magnifier', aventure: 'compass', collection: 'trophy', famille: 'person' };
   document.querySelectorAll('.tabbar a').forEach(a => { const em = a.querySelector('.em'); if (em) em.outerHTML = `<span class="em">${icon(TAB_ICON[a.dataset.tab])}</span>`; });
 }
 setSoundEnabled(state.settings.sound !== false);

@@ -8,7 +8,7 @@ const ALL = ['treasure', 'detective', 'nature', 'photo', 'challenge', 'imaginary
 // ---------- Nouveaux lieux ----------
 export const EXTRA_PLACES = [
   {
-    id: 'thuret', name: 'Jardin de la Villa Thuret', emoji: '🌴', area: 'Cap d\'Antibes', lat: 43.5640, lng: 7.1225,
+    id: 'thuret', name: 'Jardin de la Villa Thuret', emoji: '🌴', area: 'Cap d\'Antibes', lat: 43.5633517, lng: 7.1246826,
     at: 'dans le jardin botanique de la Villa Thuret', hours: 'day', hoursNote: 'Jardin gratuit, ouvert en semaine : horaires à vérifier.', tags: ['nature', 'jardin'],
     safety: 'Jardin scientifique : on reste dans les allées et on ne cueille rien.',
     badge: { id: 'q-thuret', name: 'Botaniste du monde', emoji: '🌴' },
@@ -36,7 +36,7 @@ export const EXTRA_PLACES = [
     ],
   },
   {
-    id: 'brague', name: 'Parc de la Brague', emoji: '🏞️', area: 'Antibes', lat: 43.6170, lng: 7.0950,
+    id: 'brague', name: 'Parc de la Brague', emoji: '🏞️', area: 'Antibes', lat: 43.6119796, lng: 7.0860576,
     at: 'sur les sentiers du parc de la Brague', hours: 'day', tags: ['nature', 'forêt', 'rivière'],
     safety: 'Rivière : on ne s\'en approche jamais seul, et jamais après de fortes pluies. Chaussures fermées conseillées.',
     badge: { id: 'q-brague', name: 'Coureur des bois de la Brague', emoji: '🏞️' },
@@ -67,7 +67,7 @@ export const EXTRA_PLACES = [
     ],
   },
   {
-    id: 'salis', name: 'Plage de la Salis', emoji: '🌊', area: 'Antibes', lat: 43.5737, lng: 7.1300,
+    id: 'salis', name: 'Plage de la Salis', emoji: '🌊', area: 'Antibes', lat: 43.5704999, lng: 7.1287130,
     at: 'sur la plage de la Salis, face à la vieille ville', hours: 'always', tags: ['mer', 'vue', 'jeux'],
     safety: 'Baignade uniquement avec un adulte, et jamais par mer agitée.',
     badge: { id: 'q-salis', name: 'Sentinelle de la Salis', emoji: '🌊' },
@@ -95,7 +95,7 @@ export const EXTRA_PLACES = [
     ],
   },
   {
-    id: 'peynet', name: 'Musée Peynet', emoji: '✏️', area: 'Antibes', lat: 43.5815, lng: 7.1266, indoor: true, noPhoto: true,
+    id: 'peynet', name: 'Musée Peynet', emoji: '✏️', area: 'Antibes', lat: 43.5809259, lng: 7.1259031, indoor: true, noPhoto: true,
     at: 'au musée Peynet et du dessin humoristique', hours: 'museum', hoursNote: 'Musée payant, fermé le lundi : horaires à vérifier.', tags: ['art', 'pluie', 'quartier'],
     safety: 'On ne touche pas les dessins, on chuchote.',
     badge: { id: 'q-peynet', name: 'Dessinateur en herbe', emoji: '✏️' },
@@ -247,15 +247,15 @@ export const EXTRA_BONUS_STEPS = [
 // ---------- Scénarios supplémentaires ----------
 export const EXTRA_STORIES = {
   treasure: { titles: ['Le secret de la boussole d\'or'], intros: ['Une bouteille échouée contenait une carte : la croix rouge se trouve quelque part {at}. Suivez les indices !'] },
-  detective: { titles: ['Le mystère du message codé'], intros: ['Un message codé a été glissé sous la porte de l\'Inspectrice Loupe. Il parle d\'un secret caché {at}.'] },
+  detective: { titles: ['Le mystère du message codé'], intros: ['Un message codé a été glissé sous la porte de Pistou. Il parle d\'un secret caché {at}.'] },
   nature: { titles: ['Le grand inventaire'], intros: ['Une famille d\'écureuils a besoin d\'aide : il faut faire l\'inventaire de la nature {at} avant l\'hiver.'] },
   photo: { titles: ['Les reporters de la Côte d\'Azur'], intros: ['Une agence de photographes cherche les images les plus originales prises {at}. À vous de jouer !'] },
   challenge: { titles: ['Le tournoi des explorateurs'], intros: ['Le grand tournoi des explorateurs commence {at} : épreuves d\'adresse, d\'observation et de fou rire !'] },
 };
 
 export const EXTRA_THEMES = [
-  { id: 'magicien', name: 'Apprentis magiciens', guide: { name: 'Maître Grimoire', emoji: '🧙' },
-    title: 'L\'école des magiciens', intro: 'Le grimoire de Maître Grimoire a perdu ses formules {at}. Chaque mission réussie en fait réapparaître une !' },
-  { id: 'astronaute', name: 'Astronautes', guide: { name: 'Commandante Comète', emoji: '🚀' },
+  { id: 'magicien', name: 'Apprentis magiciens', guide: { name: 'Pistou l\'apprenti magicien', emoji: '🦊' },
+    title: 'L\'école des magiciens', intro: 'Le grimoire magique de Pistou a perdu ses formules {at}. Chaque mission réussie en fait réapparaître une !' },
+  { id: 'astronaute', name: 'Astronautes', guide: { name: 'Pistou l\'astronaute', emoji: '🦊' },
     title: 'Mission planète {place}', intro: 'Votre fusée vient d\'atterrir {at}, sur une planète inconnue. Explorez-la et faites votre rapport à la base !' },
 ];
